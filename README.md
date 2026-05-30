@@ -1,90 +1,151 @@
 # RMN Agent
 
-## 1. Project Overview
+一个面向科研文档和实验室 SOP 的双路 RAG 助手，用来区分“论文证据”和“可执行操作规范”。
 
-RMN Agent 是一个面向实验室知识工作的 AI Agent 解决方案 Demo，适合作为售前实习、AI Solution Intern 或技术型作品集项目展示。当前实现包含 Streamlit 聊天界面、双路 RAG 检索流程，以及基于证据引用的回答生成能力，主要处理两类知识源：科研论文与实验室手册 / SOP 文档。
+## 1. 项目概述
 
-这个项目模拟的业务问题很典型：技术团队需要快速从分散的论文、说明书和 SOP 中获得答案，但涉及实验步骤、安全要求或可执行操作时，回答必须可追溯，并且不能把论文中的探索性参数直接当作本地批准的操作规范。RMN Agent 通过知识源分流、意图识别、双路检索、融合生成和引用校验来展示一个更可信的 AI 文档问答方案。
+RMN Agent 是一个本地运行的实验室知识问答原型。它面向科研论文、补充材料、设备手册和 SOP 文档，提供从文档入库、问题分析、双路检索、基于证据生成回答到引用检查的一套 RAG 流程。
 
-因此，本仓库不只是一个脚本集合，而是一个可以讲清楚业务痛点、方案设计、技术实现和演示价值的 AI Agent Demo。它适合用于面试、作品集、课程项目或售前岗位场景中，展示从需求理解到可运行原型的完整思路。
+这个项目要解决的问题不是“让模型读更多文档”这么简单。在实验室和 R&D 场景里，论文里的方法和参数往往是研究证据，能帮助理解实验设计、材料选择和观察结果；但 SOP、设备手册和本地规范才更接近可执行流程、安全要求和机构约束。把这些来源直接混在一起检索，可能让回答看起来很完整，却模糊了“学术参考”和“本地批准操作”之间的边界。
 
-## 2. Business Scenario
+RMN Agent 的核心设计是把论文与 SOP / 手册在入库、检索和回答解释上分开处理。系统会先分析用户问题，判断它更偏论文解读、操作规范，还是需要二者结合；随后从 Chroma 向量库中按 `doc_type=paper` 或 `doc_type=sop` 分路召回片段，并在 Prompt 中要求回答基于检索证据、保留引用线索。
 
-本项目模拟的目标客户是科研实验室、R&D 团队、技术支持团队或设备 / 试剂相关的应用科学团队。典型用户包括研究人员、实验室管理员、应用工程师、技术支持人员，以及需要快速理解复杂技术文档的业务或售前角色。
+当前版本已经实现 Streamlit 聊天式界面、本地文档入库、Chroma 检索、Google Gemini 调用、查询路由、回答引用线索、轻量级 citation validation、单篇论文范围控制、debug 面板以及基础测试和评估脚本。它不是生产系统，也没有权限、审计、监控或企业集成。
 
-他们的痛点包括：
+作为作品集项目，RMN Agent 适合展示 AI Agent、RAG 系统设计、文档工程、技术风险意识、技术方案表达和演示型原型构建能力。它的价值首先来自一个清楚的技术边界：论文证据可以帮助理解和对比，SOP / 手册才应承担操作约束的角色。
 
-- 论文、补充材料、设备说明书和 SOP 分散存放，人工检索效率低。
-- 论文中的实验参数有参考价值，但不能直接替代本地批准的 SOP。
-- 技术文档问答如果没有引用来源，很难在客户演示或内部评审中建立信任。
-- 涉及数字、参数、实验步骤或安全要求时，AI 回答必须尽量可解释、可复查。
+## 2. 核心问题：为什么要区分论文和 SOP？
 
-RMN Agent 作为 Demo 方案回应这些痛点：入库阶段区分 `paper` 与 `sop`，提问阶段通过 query analyzer 判断用户意图，再从对应知识路径中检索证据，最后生成带引用提示与校验结果的回答。
+论文通常包含探索性方法、实验参数、材料配方、观察结果和学术解释。它们适合回答“研究中怎么做”“参数范围是什么”“不同论文结果有什么差异”这类问题，但论文中的实验条件不一定适用于当前实验室，也不一定经过本地安全、设备或流程审批。
 
-在面试或售前演示中，这个项目可以被定位为一个“小而完整”的 AI 解决方案原型：它体现了业务场景理解、RAG 架构设计、Agent 流程编排、客户价值表达，以及对 AI 风险和边界的认识。
+SOP、设备手册和实验室规范的角色不同。它们通常包含被批准的操作流程、安全要求、设备限制、维护说明、校准步骤和本地约束。对于实际操作问题，系统不能把论文中的探索性参数直接当成本地流程，更不能在缺少 SOP 证据时假装已经确认。
 
-## 3. Key Features
+如果 RAG 系统把两类文档放进同一个检索路径，模型可能会把论文片段里的方法描述和 SOP 片段里的操作要求混在一起回答。对于普通知识问答，这可能只是引用不清；对于实验室、R&D 或技术支持场景，这会影响可追溯性和风险判断。
 
-- **论文 / SOP 双路检索**：论文和手册在入库时使用不同的 `doc_type` 元数据，并在检索时分路处理。业务价值：可以向面试官或客户解释为什么研究证据和操作规范不能混在一起。
-- **意图感知的 Query Routing**：`query_analyzer.py` 将问题分类为 `SOP_ONLY`、`PAPER_ONLY` 或 `HYBRID`，同时区分 `SCHOLARLY`、`OPERATIONAL`、`HYBRID` 等回答模式。业务价值：Agent 会根据用户问题调整行为，而不是套用固定问答模板。
-- **Streamlit 演示界面**：`app.py` 提供聊天入口、知识库文件列表、入库按钮、单篇论文锁定、流式回答、引用展示和 debug 面板。业务价值：项目具备可直接演示的前端界面，适合面试和作品集展示。
-- **基于证据的回答生成**：`fusion_prompts.py` 要求模型只基于检索片段回答，并保留 `citation_hint`。业务价值：展示如何减少无依据回答，提高技术文档问答的可信度。
-- **引用校验层**：`citation_validator.py` 检查回答中的引用是否来自当前检索结果，并标记缺少引用的数字型声明。业务价值：Demo 不只停留在“能生成答案”，还加入了轻量级质量控制。
-- **文档入库流水线**：`ingest.py` 支持 `data/papers/` 与 `data/manuals/` 下的 PDF 和 `.docx` 文件，完成解析、切分、嵌入、Chroma 入库和处理记录维护。业务价值：体现知识库可更新、可维护的交付思路。
-- **论文范围控制与重排**：UI 支持锁定单篇论文，`fusion_scope.py` 支持 metadata filter 与标题软匹配重排。业务价值：可展示如何降低跨文档混淆和错误引用风险。
-- **测试与烟测评估**：`tests/` 和 `eval/rag_eval.py` 覆盖 query fallback、scope 过滤、引用校验、入库前缀和检索 smoke cases。业务价值：说明项目具备基本验证意识，而不是一次性 Demo。
+RMN Agent 因此把来源类型作为系统设计的一部分，而不是后处理标签。入库时写入 `doc_type`，检索时按路径过滤，回答时区分论文证据和 SOP / 手册约束，最后再对回答中的引用线索做轻量检查。
 
-## 4. Solution Architecture
+| 文档类型 | 典型内容 | 在 RMN Agent 中的角色 |
+|---|---|---|
+| 论文 / 补充材料 | 方法、参数、实验设计、结果解释 | 作为研究证据和学术参考 |
+| SOP / 手册 | 标准流程、安全要求、设备操作、限制条件 | 作为操作规范和执行约束 |
 
-当前实现架构如下：
+## 3. 当前功能
+
+### 论文 / SOP 双路检索
+
+- 当前实现：`ingest.py` 扫描 `data/papers/` 和 `data/manuals/`，分别写入 `doc_type=paper` 与 `doc_type=sop`。`rag_core.py` 在检索阶段把 `doc_type` 与可选元数据过滤条件合并，按论文路径、SOP 路径或混合路径召回片段。
+- 为什么重要：论文可以作为研究证据，但不应自动变成可执行流程。双路检索让回答能说明“这个结论来自论文”还是“这个约束来自 SOP / 手册”。
+- 对应代码位置：`ingest.py`、`rag_core.py`。
+
+### Query Analysis 与问题路由
+
+- 当前实现：`query_analyzer.py` 使用 Pydantic 定义结构化输出，字段包括 `intent`、`answer_mode`、`paper_scope_source`、`paper_scope_project_id`、`paper_scope_paper_title`、`requires_full_protocol` 和双路 `search_queries`。可用时通过 Google Gemini 做结构化分析；不可用时使用规则 fallback。
+- 为什么重要：用户问题可能是论文型、操作型或混合型。先分析问题，再决定检索路径，可以减少无差别检索导致的来源混淆。
+- 对应代码位置：`query_analyzer.py`、`rag_core.py`。
+
+### Streamlit 聊天式演示界面
+
+- 当前实现：`app.py` 提供本地 Streamlit 聊天界面，侧边栏展示论文与手册目录，支持触发入库、全量重建、选择单篇论文范围、查看最近一次 query analysis。回答区域展示流式生成结果、论文引用、手册引用和 citation validation debug 信息。
+- 为什么重要：这个项目可以被现场演示，而不是只停留在命令行脚本。面试或项目展示时，可以直接展示从提问到检索、回答、引用检查的完整路径。
+- 对应代码位置：`app.py`。
+
+### 文档入库流水线
+
+- 当前实现：`ingest.py` 支持 `.pdf` 和 `.docx` 文件。PDF 可通过 LlamaParse 解析，也可在配置允许时用 pdfplumber 兜底；Word 文档通过 python-docx 解析。入库流程包括目录扫描、论文与手册分类、论文正文与补充材料的文件名规则配对、文本切分、embedding、写入 Chroma、维护 `processed_files.json` 和 `corpus_manifest.json`。
+- 为什么重要：RAG 的质量高度依赖入库质量。把论文和手册在入库阶段就分开，可以让后续检索、引用和 debug 都有明确的元数据基础。
+- 对应代码位置：`ingest.py`。
+
+### Chroma 向量库检索
+
+- 当前实现：`rag_core.py` 通过 `langchain_chroma.Chroma` 读取本地持久化 collection。检索时使用 `doc_type` 过滤，并支持可配置的向量检索或向量 + 词法混合召回。检索参数通过 `.env` 中的 `RAG_RETRIEVAL_MODE`、`HYBRID_LEXICAL_WEIGHT`、`HYBRID_LEXICAL_POOL_LIMIT` 等变量控制。
+- 为什么重要：Chroma 提供本地可复现的向量检索能力，适合 Demo 和作品集场景；元数据过滤让系统能按来源类型控制召回范围。
+- 对应代码位置：`rag_core.py`、`ingest.py`、`.env.example`。
+
+### 基于证据的回答生成
+
+- 当前实现：`rag_core.py` 将检索到的论文片段和 SOP 片段格式化为上下文块，再由 `fusion_prompts.py` 组装系统 Prompt。Prompt 要求模型只基于参考块回答，遇到缺失证据时明确说明，不虚构参数、统计值或操作步骤。
+- 为什么重要：RAG 系统的可信度不只取决于“能否回答”，还取决于回答是否能回到检索证据。这个设计让模型输出更容易被复查。
+- 对应代码位置：`rag_core.py`、`fusion_prompts.py`。
+
+### 引用线索与 citation validation
+
+- 当前实现：`rag_core.py` 在上下文块中生成 `citation_hint`，回答 Prompt 要求模型逐字保留引用线索。`citation_validator.py` 会检查回答中出现的 `[Source: ...]` 是否来自本轮检索结果，并标记缺少引用的数字型声明。当前为轻量级实现，不做完整语义事实验证。
+- 为什么重要：引用线索能帮助用户追溯来源；轻量校验可以发现一些常见问题，例如模型引用了本轮没有检索到的来源，或给出带单位的参数却没有引用。
+- 对应代码位置：`rag_core.py`、`fusion_prompts.py`、`citation_validator.py`。
+
+### 单篇论文锁定或范围控制
+
+- 当前实现：`app.py` 侧边栏允许选择某一篇 `data/papers/` 下的论文作为 `source` 范围。`query_analyzer.py` 也可以从问题中提取文件名、项目或标题范围。`fusion_scope.py` 负责构造 Chroma 元数据过滤条件，并对标题提示做软重排。
+- 为什么重要：当知识库中有多篇相近论文时，单篇锁定可以降低跨文档混淆和错误引用风险。标题软重排则避免过度依赖易碎的精确标题匹配。
+- 对应代码位置：`app.py`、`query_analyzer.py`、`fusion_scope.py`、`rag_core.py`。
+
+### Debug 面板
+
+- 当前实现：Streamlit 界面显示本轮 `intent`、`answer_mode`、`requires_full_protocol`、实体、检索说明、论文 / SOP chunk 数量和 citation validation 结果。侧边栏也保留最近一次 query analysis。
+- 为什么重要：debug 面板让检索路径、意图判断和引用校验更透明，适合技术面试、方案讲解和问题排查。
+- 对应代码位置：`app.py`。
+
+### 基础测试与评估脚本
+
+- 当前实现：`tests/` 中包含 query analyzer fallback、fusion scope、citation validator、ingest 文档前缀等单元测试。`eval/rag_eval.py` 读取 `eval/golden_questions.jsonl`，检查路由和来源覆盖；`sample_chroma_snippets.py` 与 `list_chroma_catalog.py` 用于查看本地 Chroma 内容。
+- 为什么重要：当前测试不是完整质量评估，但能覆盖关键的规则逻辑和 Demo 前的基础检查，减少现场演示时的低级错误。
+- 对应代码位置：`tests/`、`eval/rag_eval.py`、`eval/golden_questions.jsonl`、`sample_chroma_snippets.py`、`list_chroma_catalog.py`。
+
+## 4. 系统工作流
+
+用户在 Streamlit 界面输入问题后，`app.py` 会先调用 `query_analyzer.py` 对问题做结构化分析。分析结果会判断问题更适合走 `PAPER_ONLY`、`SOP_ONLY` 还是 `HYBRID` 路径，同时给出回答模式、实体、检索 query 和可选论文范围。
+
+随后 `rag_core.py` 根据分析结果从 Chroma 中召回相关片段。如果问题偏论文，系统主要检索 `doc_type=paper`；如果问题偏手册或 SOP，系统检索 `doc_type=sop`；如果问题需要结合研究证据和操作约束，则两条路径都会执行。论文路径还支持按 `source`、`project_id` 或标题提示进行范围控制。
+
+检索完成后，系统把论文片段和 SOP 片段分别组装成带 `citation_hint` 的上下文块，再由 `fusion_prompts.py` 生成回答 Prompt。Prompt 会根据 `answer_mode` 调整回答形态：论文型问题偏方法、结果和对比；操作型问题强调 SOP 对齐和风险提示；混合型问题允许结合两类证据，但不能把论文参数直接当成本地批准流程。
+
+LLM 返回回答后，`citation_validator.py` 对回答中的引用和数字型声明做轻量检查。最终 Streamlit 界面展示回答、论文引用、手册引用、query analysis、检索结果数量和 citation validation 结果。这个流程的重点是把模型回答背后的检索路径和来源类型显示出来，而不是只给一个最终文本。
+
+## 5. 系统架构
 
 ```mermaid
 flowchart TD
-    User[用户 / 售前演示场景] --> UI[Streamlit UI app.py]
-    UI --> Analyzer[Query Analyzer query_analyzer.py]
-    Analyzer --> Router{Intent Route}
-    Router --> PaperRetriever[论文检索 doc_type=paper]
-    Router --> SOPRetriever[SOP 检索 doc_type=sop]
-    PaperRetriever --> Chroma[(Chroma 向量库)]
-    SOPRetriever --> Chroma
-    Chroma --> Bundle[Fusion Bundle rag_core.py]
-    Bundle --> Prompt[Fusion Prompt fusion_prompts.py]
-    Prompt --> LLM[Google Gemini via LangChain]
+    User[用户问题] --> UI[Streamlit 界面 app.py]
+    UI --> Analyzer[问题分析 query_analyzer.py]
+    Analyzer --> Router{检索路由}
+    Router --> Paper[论文检索路径 doc_type=paper]
+    Router --> SOP[SOP/手册检索路径 doc_type=sop]
+    Paper --> Chroma[(Chroma 向量库)]
+    SOP --> Chroma
+    Chroma --> Context[上下文组装 rag_core.py]
+    Context --> Prompt[回答 Prompt fusion_prompts.py]
+    Prompt --> LLM[LLM 调用]
     LLM --> Validator[引用校验 citation_validator.py]
-    Validator --> Output[结构化回答 + 引用 + Debug 面板]
-    Config[.env / 环境变量] --> UI
-    Config --> Analyzer
+    Validator --> Output[回答 / 引用 / Debug 信息]
+    Config[.env 配置] --> UI
     Config --> Chroma
     Config --> LLM
 ```
 
-架构层说明：
+- 交互层：`app.py` 负责 Streamlit 页面、聊天输入、侧边栏文件列表、入库按钮、论文范围选择、流式回答展示、引用展示和 debug 面板。
+- 问题分析层：`query_analyzer.py` 负责把用户问题转换成结构化分析结果，包括检索路由、回答模式、实体、论文范围和双路检索 query；LLM 不可用时使用规则 fallback。
+- 检索层：`rag_core.py` 负责加载 Chroma、合并 `doc_type` 与范围过滤条件、执行向量或混合检索，并在论文路径上处理补充材料增强与多论文补充召回。
+- 上下文与 Prompt 层：`rag_core.py` 把检索结果格式化为带 `citation_hint` 的上下文块；`fusion_prompts.py` 按 scholarly、operational、hybrid 场景组装系统 Prompt。
+- 模型调用层：`query_analyzer.py` 和 `rag_core.py` 通过 LangChain 调用 Google Gemini，用于问题分析和回答生成；embedding provider 在 `ingest.py` 中按配置选择。
+- 引用校验层：`citation_validator.py` 检查回答中引用线索是否属于本轮检索结果，并找出缺少引用的数字型声明。当前是轻量规则检查。
+- 配置与数据层：`.env.example` 描述模型密钥、embedding provider、Chroma 路径、解析选项和检索参数；`data/papers/` 与 `data/manuals/` 存放本地非敏感文档；`chroma_db/` 为默认向量库目录。
 
-- **用户输入层**：`app.py` 中的 Streamlit chat input 接收用户问题，侧边栏可选择是否锁定某一篇论文。
-- **Agent 编排层**：`query_analyzer.py` 和 `rag_core.py` 负责意图分析、检索参数准备、上下文拼装和每轮 prompt 组装。
-- **工具 / 能力层**：包括文档入库、Chroma 检索、向量 + 词法混合召回、论文范围过滤、补充材料增强、引用格式化和引用校验。
-- **模型调用层**：通过 LangChain 调用 Google Generative AI 进行 query analysis 和回答生成；嵌入模型可通过 `EMBEDDING_PROVIDER` 选择 Google/Gemini、OpenAI、智谱或 HuggingFace。
-- **输出层**：Streamlit UI 流式展示回答，并显示论文引用、手册引用、query analysis 和 citation validation 结果。
-- **配置层**：`.env.example` 说明模型密钥、Chroma 设置、解析选项、检索调参和入库调参；运行时通过 `python-dotenv` 读取。
+## 6. 技术栈
 
-需要注意：当前仓库没有生产级 API Server、用户认证、CRM 集成、监控面板或 Docker 部署。这些内容已在后续优化中列为规划方向，而不是已完成功能。
+- Python：项目主要开发语言，用于入库、RAG 编排、检索、评估和测试。
+- Streamlit：提供本地聊天式演示界面，对应 `app.py`。
+- LangChain：用于 Document 抽象、Prompt 编排、输出解析、模型调用和 Chroma 集成。
+- Google Gemini / Google Generative AI：用于 query analysis、回答生成和默认 Google embedding 路径，需要配置 API Key。
+- Chroma：本地持久化向量库，用于保存论文和 SOP / 手册 chunk，并支持基于元数据的过滤检索。
+- Pydantic：定义 query analysis 的结构化输出模型，减少下游字段混乱。
+- python-dotenv：从 `.env` 加载本地运行配置。
+- LlamaParse：可选 PDF 解析服务，用于尽量保留文档结构；需要 `LLAMA_CLOUD_API_KEY`。
+- pdfplumber：PDF fallback 解析工具，在未使用 LlamaParse 或解析失败时可按配置启用。
+- python-docx：解析 `.docx` 手册、SOP 或论文文档。
+- sentence-transformers：选择 HuggingFace embedding provider 时使用。
+- pytest / unittest：项目中 `Makefile` 通过 `unittest` 运行测试，依赖列表包含 pytest，便于后续扩展测试方式。
 
-## 5. Tech Stack
-
-- **Python 3.10+**：项目主要开发语言，用于 Agent、入库、评估和测试。
-- **Streamlit**：提供本地聊天式 Demo UI，对应 `app.py`。
-- **LangChain / LangChain Core**：用于 prompt chain、Document 抽象、输出解析和模型集成。
-- **LangChain Google GenAI**：连接 Google Gemini，用于 query analysis 和回答生成。
-- **Chroma / LangChain Chroma**：本地持久化向量库，用于存储和检索文档 chunk。
-- **Pydantic**：定义结构化 query analysis 输出模型。
-- **python-dotenv**：从 `.env` 加载本地运行配置。
-- **LlamaParse**：可选文档解析能力，在配置 `LLAMA_CLOUD_API_KEY` 后使用。
-- **pdfplumber**：可选 PDF fallback 解析能力。
-- **python-docx**：支持本地 `.docx` 文档解析。
-- **sentence-transformers**：在选择 HuggingFace embedding provider 时使用。
-- **pytest / unittest**：用于本地测试和基础验证。
-
-## 6. Repository Structure
+## 7. 仓库结构
 
 ```text
 RMN_Agent/
@@ -119,77 +180,81 @@ RMN_Agent/
 └── README.md
 ```
 
-主要目录和文件职责：
+- `app.py`：Streamlit 交互入口，负责本地聊天界面和 debug 展示。
+- `ingest.py`：文档解析、分类、切分、embedding、Chroma 入库和处理记录维护。
+- `rag_core.py`：RAG 主流程，负责检索、上下文组装、Prompt 调用和引用列表格式化。
+- `query_analyzer.py`：问题分析与检索路由，包含 LLM 分析和规则 fallback。
+- `fusion_prompts.py`：回答生成 Prompt 的规则集合。
+- `fusion_scope.py`：论文范围过滤、标题软匹配和检索数量调整。
+- `citation_validator.py`：回答生成后的轻量引用检查。
+- `list_chroma_catalog.py`：查看 Chroma 中已入库文档目录。
+- `sample_chroma_snippets.py`：抽样查看 Chroma chunk，便于检查入库效果。
+- `data/papers/`：放置本地论文、正文或补充材料。
+- `data/manuals/`：放置本地 SOP、设备手册或操作说明。
+- `eval/`：检索烟测问题和评估脚本。
+- `tests/`：不依赖真实客户数据的基础单元测试。
+- `docs/`：架构说明、演示脚本和作品集定位说明。
 
-- `app.py`：Streamlit 交互入口和 Demo UI。
-- `ingest.py`：文档解析、元数据抽取、切分、embedding、Chroma 入库、处理记录和 corpus manifest。
-- `rag_core.py`：向量库加载、双路检索、混合召回、SI 增强、上下文格式化和 LLM chain 构建。
-- `query_analyzer.py`：结构化 query 分析，包含 LLM 路径和保守的 heuristic fallback。
-- `fusion_prompts.py`：scholarly、operational、hybrid 回答模式的 prompt 片段。
-- `fusion_scope.py`：论文 source 过滤、标题软匹配和检索 `k` 调整。
-- `citation_validator.py`：生成后引用校验。
-- `eval/`：golden questions 与检索 smoke evaluation。
-- `tests/`：不依赖外部 API 的单元测试。
-- `data/papers/` 与 `data/manuals/`：本地文档投放目录；当前仓库只包含占位文件，不包含真实客户数据。
+## 8. 本地运行
 
-## 7. Getting Started
-
-克隆仓库并进入项目目录：
+1. 克隆仓库并进入目录：
 
 ```bash
 git clone <your-repo-url>
 cd RMN_Agent
 ```
 
-创建并激活虚拟环境：
+2. 创建并激活虚拟环境：
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-安装依赖：
+3. 安装依赖：
 
 ```bash
 pip install -r requirements.txt
 ```
 
-创建本地配置文件：
+4. 创建本地配置文件：
 
 ```bash
 cp .env.example .env
 ```
 
-根据本地情况填写密钥。默认 Google 路径至少需要 `GOOGLE_API_KEY` 或 `GEMINI_API_KEY`。如果没有 LlamaParse key，但希望使用 PDF fallback，可按需设置 `INGEST_PDFPLUMBER_FALLBACK=true`。
+5. 配置 API Key：
 
-添加文档：
+默认配置使用 Google Gemini 路径。至少需要在 `.env` 中填写 `GOOGLE_API_KEY` 或 `GEMINI_API_KEY`。如果使用 LlamaParse 解析 PDF，还需要填写 `LLAMA_CLOUD_API_KEY`；如果没有 LlamaParse key，可以按需设置 `INGEST_PDFPLUMBER_FALLBACK=true` 使用 pdfplumber 兜底。不要提交真实 API Key。
+
+6. 放入论文和 SOP / 手册文件：
 
 ```text
 data/papers/   # 论文、正文、补充材料
 data/manuals/  # SOP、设备手册、操作说明
 ```
 
-执行入库：
+当前仓库只保留目录占位，不包含真实客户数据或示例语料。如果这两个目录没有可索引的 `.pdf` 或 `.docx` 文件，入库和完整问答演示无法正常完成。
+
+7. 执行入库：
 
 ```bash
 make ingest
 ```
 
-如果语料目录为空，入库脚本会因为没有可索引文件而非零退出。完整 Demo 前请至少放入一个支持的 `.pdf` 或 `.docx` 文件。
-
-全量重建向量库：
+如需清空本地向量库并重新入库：
 
 ```bash
 make rebuild
 ```
 
-启动 Streamlit UI：
+8. 启动 Streamlit：
 
 ```bash
 make app
 ```
 
-运行测试和烟测：
+9. 运行测试和基础检查：
 
 ```bash
 make test
@@ -197,49 +262,70 @@ make smoke
 make eval
 ```
 
-推荐 Demo 问题：
+`make smoke` 和 `make eval` 会依赖本地 Chroma 内容。若没有先完成入库，相关检查可能无法得到有意义结果。
 
-- `这篇论文里的 microgel 制备步骤和关键参数是什么？`
-- `如果我要参考论文复现实验，哪些步骤需要同时核对本实验室 SOP？`
-- `对比两篇 3D microgel mechanical stimulation 论文，刺激方式、时间和细胞响应有什么差异？`
-- `Leica DMi8 手册中有哪些基础操作或安全注意事项？`
-- `当前检索上下文里缺少哪些 protocol 细节？`
+## 9. 示例问题
 
-## 8. Demo Flow
+- `这篇 microgel 论文使用了哪些关键制备步骤和实验参数？请按证据来源回答。`
+- `论文中的交联时间、温度或浓度是否足够支持复现实验？哪些信息在当前上下文里缺失？`
+- `如果我要把论文里的 microgel 制备方法用于本实验室操作，哪些步骤必须再核对 SOP？`
+- `设备手册中对显微镜或粒径测量设备的启动、校准和安全注意事项有什么要求？`
+- `请对比两篇 microgel 相关论文在材料配方、刺激方式和细胞响应上的差异，并保留引用。`
+- `当前 SOP / 手册是否支持论文中提到的这个操作流程？如果不支持，请明确说明缺口。`
+- `请只基于 SOP / 手册回答：这个设备使用前需要做哪些检查？`
+- `当前检索证据是否足够给出完整 protocol？如果不足，请列出还需要补充的文档或页面。`
 
-1. 介绍业务背景：实验室或 R&D 团队有大量论文和 SOP，但用户需要更快、更可追溯地获取答案。
-2. 展示仓库结构：说明 `data/papers/` 与 `data/manuals/` 在入库前就被区分。
-3. 放入示例 `.pdf` 或 `.docx` 文件，运行 `make ingest` 建立本地 Chroma 知识库。
-4. 打开 Streamlit App，先提一个论文型问题，展示 paper path 检索和引用结果。
-5. 再提一个操作型或复现实验问题，展示 Agent 如何同时考虑论文参数和 SOP 约束。
-6. 打开 debug 面板，讲解 query routing、retrieved references 和 citation validation。
-7. 总结客户价值：提升技术文档检索效率、增强回答可追溯性，并避免把论文内容误当作批准流程。
+## 10. 演示流程
 
-## 9. Presales Value
+1. 先解释问题背景：科研团队常同时使用论文、补充材料、设备手册和 SOP，但这些文档的可信角色不同。
+2. 展示 `data/papers/` 和 `data/manuals/` 的区别，说明入库阶段已经把论文证据和操作规范分开。
+3. 放入一组非敏感示例文档，执行 `make ingest`，说明解析、切分、embedding 和 Chroma 入库流程。
+4. 提问一个论文型问题，例如 microgel 制备参数或实验结果，让系统走 paper 路径并展示引用。
+5. 提问一个 SOP / 手册型问题，例如设备使用、校准或安全注意事项，让系统走 SOP 路径。
+6. 提问一个 hybrid 问题，例如“能否根据论文复现实验，需要核对哪些 SOP”，展示两类来源如何共同进入回答。
+7. 打开 debug 面板，解释 `intent`、`answer_mode`、检索 chunk 数量、论文范围控制和引用校验结果。
+8. 说明 citation validation 的意义：它不能证明回答完全正确，但可以检查引用是否来自本轮检索，并提示缺少引用的数字型声明。
+9. 总结项目价值：这个原型展示了 RAG 系统设计、Agent 工作流拆解、风险边界表达和可演示原型构建能力，适合用于技术面试或解决方案类岗位作品集。
 
-RMN Agent 可以体现以下售前实习 / AI Solution Intern 能力：
+## 11. 这个项目能展示什么能力
 
-- **业务需求理解**：项目从真实知识工作痛点出发，而不是泛泛做一个聊天机器人。
-- **技术方案表达**：能把业务问题映射到 ingestion、routing、retrieval、generation、validation 的 RAG 架构。
-- **AI Agent Demo 搭建**：Streamlit UI 支持短时间内完成可视化演示。
-- **客户价值转译**：把技术功能转化为可追溯性、安全边界、演示可用性和运营决策支持。
-- **可扩展方案思维**：当前本地原型可以继续扩展到 UI、API、权限、监控和企业系统集成。
-- **文档化与交付意识**：README、架构文档、演示脚本、环境变量模板和测试说明共同构成可交付材料。
+| 能力 | 项目中的体现 |
+|---|---|
+| RAG 系统设计 | `ingest.py`、`rag_core.py` 和 Chroma 元数据过滤共同实现论文 / SOP 分路入库与检索。 |
+| Agent 工作流拆解 | `query_analyzer.py` 先做问题分析，再由 `rag_core.py` 执行检索、上下文组装和生成。 |
+| 文档工程与知识库构建 | 入库流程支持 PDF、`.docx`、论文补充材料识别、chunk 切分、处理记录和 corpus manifest。 |
+| 技术风险意识 | Prompt 和 README 都明确论文参数不能替代本地批准 SOP，citation validator 也只定位为轻量检查。 |
+| 可演示原型构建 | `app.py` 提供可现场操作的 Streamlit 界面，包含入库按钮、聊天、引用和 debug 信息。 |
+| 技术方案表达 | `README.md`、`docs/architecture.md` 和 `docs/demo_script.md` 说明问题背景、架构选择、演示路径和限制。 |
 
-## 10. Future Improvements
+## 12. 当前限制
 
-以下内容是后续优化方向，不是当前代码已完成能力：
+- 当前是本地 Demo，不是生产系统。
+- 没有用户权限、审计、监控、日志平台和企业系统集成。
+- 没有 REST API 或独立后端服务层，主要入口是 Streamlit。
+- citation validation 是轻量级检查，不是形式化事实验证，也不能证明完整语义忠实。
+- 回答质量依赖入库文档质量、chunk 切分效果、检索结果和模型输出。
+- 需要配置外部模型 API Key；缺少 API Key 时只能依赖部分规则逻辑，无法完整生成回答。
+- UI 主要用于演示，不是完整产品界面。
+- 仓库不包含真实语料；如果本地没有放入论文和 SOP / 手册文件，无法完整演示知识库问答。
 
-- **Web UI 优化**：增加更清晰的上传流程、Demo preset、结果导出和用户引导。
-- **多轮对话记忆**：显式管理 follow-up question 的上下文和历史状态。
-- **CRM / 数据库集成**：将回答、客户场景或实验记录连接到外部系统。
-- **权限控制**：按用户、项目或文档类型限制访问范围。
-- **日志与监控**：记录检索质量、模型错误、延迟和用户反馈。
-- **Docker 部署**：打包 app、Chroma 持久化目录和运行配置，方便演示交付。
-- **更完整的测试**：补充 ingest、Chroma retrieval、Streamlit workflow 等集成测试。
-- **行业场景模板**：为 biotech、medical devices、chemical R&D、technical support 等场景准备非敏感 Demo 语料。
-- **评估 Dashboard**：将现有 JSONL smoke evaluation 升级为更直观的演示准备报告。
+## 13. 后续改进方向
 
-## 11. Disclaimer
+- 增加更完整的 Web UI 或 API Server：让上传、检索、回答和调试能力可以被前端或外部系统调用。
+- 增加结构化输出模板：针对 protocol、论文对比、设备操作检查表等场景输出更稳定的格式。
+- 增加更强的引用校验和事实一致性检查：从字符串级引用检查扩展到句子级证据对齐和数字参数核对。
+- 支持更多文档类型：增加 `.pptx`、`.xlsx`、图片 OCR 或 ELN 导出格式，覆盖更真实的实验室资料。
+- 增加 Docker 部署：固定运行环境、依赖和 Chroma 持久化目录，降低演示复现成本。
+- 增加日志、监控和错误处理：记录检索路径、模型错误、延迟、空召回和 citation validation 结果。
+- 增加权限管理：按用户、项目、文档类型或文档来源限制可检索范围。
+- 增加更系统的评估集：扩展 `eval/golden_questions.jsonl`，评估路由准确率、来源覆盖、引用质量和失败案例。
 
-本项目是学习、作品集和售前 Demo 项目，不包含真实客户数据、生产环境密钥、经过验证的安全流程或生产级访问控制。任何真实实验操作必须以机构批准的 SOP、安全评估和人工监督为准。
+## 14. 相关文档
+
+- [架构说明](docs/architecture.md)：说明模块关系、数据流、关键设计选择和当前限制。
+- [演示脚本](docs/demo_script.md)：用于准备面试或项目展示时的讲解顺序。
+- [作品集定位](docs/presales_positioning.md)：说明如何克制地把项目能力映射到 AI Agent / RAG / 解决方案表达能力。
+
+## 15. 免责声明
+
+本项目用于学习、作品集和 Demo，不包含真实客户数据，也不应直接用于生产实验决策。涉及实验操作、安全要求、设备使用或合规判断时，应以本地批准的 SOP、设备手册、机构要求和专业人员判断为准。
