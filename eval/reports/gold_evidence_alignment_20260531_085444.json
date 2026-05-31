@@ -1,0 +1,964 @@
+{
+  "questions": 31,
+  "evidence_rows": 69,
+  "status_counts": {
+    "ok": 69
+  },
+  "orphan_evidence_question_ids": [],
+  "questions_without_evidence": [],
+  "rows": [
+    {
+      "question_id": "sop_litesizer_basic",
+      "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+      "section": "Particle-Size Measurements",
+      "must_contain_any": [
+        "Equilibration time",
+        "two minutes",
+        "ambient temperature"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 304,
+      "section_match_count": 7
+    },
+    {
+      "question_id": "sop_litesizer_basic",
+      "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+      "section": "Using the Litesizer 500 at High and Low Temperature",
+      "must_contain_any": [
+        "extra equilibration time",
+        "1mL sample",
+        "every °C"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 304,
+      "section_match_count": 12
+    },
+    {
+      "question_id": "sop_litesizer_basic",
+      "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+      "section": "第",
+      "must_contain_any": [
+        "Equilibration time for first repetition"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 304,
+      "section_match_count": 65
+    },
+    {
+      "question_id": "sop_general_lab_waste",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "nventory",
+      "must_contain_any": [
+        "Hazardous Chemicals",
+        "Waste disposal",
+        "Emergency"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 2
+    },
+    {
+      "question_id": "sop_general_lab_waste",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "the chemical is no longer",
+      "must_contain_any": [
+        "MSDS",
+        "Fume Hood"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 2
+    },
+    {
+      "question_id": "sop_bioelectronics_s1",
+      "source": "manuals/BioelectronicsLab-S1-SafetyBriefing.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Genetic Engineering Act",
+        "Safety Briefing"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 25
+    },
+    {
+      "question_id": "sop_bioelectronics_s1",
+      "source": "manuals/BioelectronicsLab-S1-SafetyBriefing.pdf",
+      "section": "Lab S1 Safety Briefing",
+      "must_contain_any": [
+        "Biological",
+        "gene-technological",
+        "safety"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 6
+    },
+    {
+      "question_id": "sop_magnetic_stirrer",
+      "source": "manuals/BA Magnetic stirrer_eng.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "MAGNETIC STIRRERS",
+        "Risk of fire",
+        "short circuit"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 7,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "sop_magnetic_stirrer",
+      "source": "manuals/BA Magnetic stirrer_eng.pdf",
+      "section": "heating temperature",
+      "must_contain_any": [
+        "low stirring speed",
+        "vessels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 7,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "sop_laser_alignment",
+      "source": "manuals/Laser Safety and Alignment.pdf",
+      "section": "ction",
+      "must_contain_any": [
+        "low-power laser",
+        "viewing card",
+        "alignment"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 11,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "sop_laser_alignment",
+      "source": "manuals/Laser Safety and Alignment.pdf",
+      "section": "w or above standing",
+      "must_contain_any": [
+        "protective housing",
+        "viewing instruments"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 11,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "sop_fume_hood_sash",
+      "source": "manuals/BA Fume hood_eng.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Risk of explosion",
+        "flammable"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 9,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "sop_fume_hood_sash",
+      "source": "manuals/BA Fume hood_eng.pdf",
+      "section": "starting",
+      "must_contain_any": [
+        "sash closed",
+        "sash"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 9,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "paper_protocol_microgel",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "gold nanorods",
+        "alginate"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_protocol_microgel",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "785",
+        "photothermal"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_protocol_microgel",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "1.4",
+        "laser"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_iyisan_stimulation_device",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "3D-Printed Stimulation Device",
+        "Mechanoactivation"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "paper_iyisan_stimulation_device",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 2 页",
+      "must_contain_any": [
+        "single stem cells",
+        "microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "paper_iyisan_hydrostatic",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Hydrostatic Pressure",
+        "osteogenic"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "paper_iyisan_hydrostatic",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "viscoelastic",
+        "microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "paper_ozkale_toolbox",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Tool-Box",
+        "Stem Cells",
+        "Biopolymer Microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "paper_d2lc_actuated",
+      "source": "papers/d2lc00203e1.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Actuated 3D microgels",
+        "single cell mechanobiology"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 4,
+      "section_match_count": 4
+    },
+    {
+      "question_id": "paper_compare",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "laser",
+        "microgel"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_compare",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "3D-Printed Stimulation Device",
+        "microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "paper_compare_stimulus_modality",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "photothermal",
+        "785"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_compare_stimulus_modality",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Stimulation Device",
+        "Mechanoactivation"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "paper_compare_stimulus_modality",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Hydrostatic Pressure"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "paper_compare_cell_type",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "mesenchymal stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_compare_cell_type",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "single stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "paper_compare_cell_type",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "osteogenic",
+        "single stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "paper_compare_platform",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "alginate",
+        "gold nanorods"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "paper_compare_platform",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "viscoelastic",
+        "microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "paper_compare_fem_vs_experiment",
+      "source": "papers/Investigating_Temperature_Strain_and_Force_Generation_in_Nanorobotic_Microgels_via_Finite_Element_Modeling.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Finite Element Modeling",
+        "nanorobotic"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 40,
+      "section_match_count": 40
+    },
+    {
+      "question_id": "paper_compare_fem_vs_experiment",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "microfluidic",
+        "alginate"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "hybrid_replicate_safety",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "microfluidic",
+        "alginate"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "hybrid_replicate_safety",
+      "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+      "section": "第",
+      "must_contain_any": [
+        "Safety Instructions",
+        "instruction manual"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 304,
+      "section_match_count": 65
+    },
+    {
+      "question_id": "hybrid_wang_laser_safety",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "785",
+        "laser"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "hybrid_wang_laser_safety",
+      "source": "manuals/Laser Safety and Alignment.pdf",
+      "section": "ction",
+      "must_contain_any": [
+        "low-power laser",
+        "alignment"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 11,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "hybrid_microgel_lab_rules",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "microgels",
+        "Stem Cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "hybrid_microgel_lab_rules",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "nventory",
+      "must_contain_any": [
+        "Waste disposal",
+        "Hazardous Chemicals"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 2
+    },
+    {
+      "question_id": "hybrid_fume_hood_solvents",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "acetic acid"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "hybrid_fume_hood_solvents",
+      "source": "manuals/BA Fume hood_eng.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "flammable",
+        "explosion"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 9,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "hybrid_litesizer_temperature",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "microgel",
+        "alginate"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "hybrid_litesizer_temperature",
+      "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+      "section": "Particle-Size Measurements",
+      "must_contain_any": [
+        "Equilibration time"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 304,
+      "section_match_count": 7
+    },
+    {
+      "question_id": "missing_evidence",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "mesenchymal stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "missing_evidence",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "single stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "missing_evidence",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "osteogenic",
+        "single stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "missing_evidence",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Tool-Box",
+        "Stem Cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "missing_complete_protocol",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "microfluidic"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "missing_complete_protocol",
+      "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Stimulation Device"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 78,
+      "section_match_count": 78
+    },
+    {
+      "question_id": "missing_complete_protocol",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Tool-Box",
+        "Stem Cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "missing_paper_to_local_sop",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "alginate"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "missing_paper_to_local_sop",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "g and Compliance",
+      "must_contain_any": [
+        "rules of safety",
+        "laboratory"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "missing_safety_full_coverage",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "laser"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "missing_safety_full_coverage",
+      "source": "manuals/Laser Safety and Alignment.pdf",
+      "section": "w or above standing",
+      "must_contain_any": [
+        "protective housing"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 11,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "missing_safety_full_coverage",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "nventory",
+      "must_contain_any": [
+        "Emergency"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 2
+    },
+    {
+      "question_id": "missing_microgel_platform_generalization",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "3D microgels",
+        "Photothermally"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "missing_microgel_platform_generalization",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Biopolymer Microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "missing_microgel_platform_generalization",
+      "source": "papers/d2lc00203e1.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Actuated 3D microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 4,
+      "section_match_count": 4
+    },
+    {
+      "question_id": "anchor_deictic_no_ui",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "g and Compliance",
+      "must_contain_any": [
+        "rules of safety"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 1
+    },
+    {
+      "question_id": "anchor_deictic_no_ui",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "microgel",
+        "Photothermally"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "anchor_corpus_literature",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "mesenchymal stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "anchor_corpus_literature",
+      "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "single stem cells"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 89,
+      "section_match_count": 89
+    },
+    {
+      "question_id": "anchor_microgel_safety_corpus",
+      "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 51
+    },
+    {
+      "question_id": "anchor_microgel_safety_corpus",
+      "source": "manuals/General Lab Rules MRBL-2.pdf",
+      "section": "nventory",
+      "must_contain_any": [
+        "Waste disposal"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 32,
+      "section_match_count": 2
+    },
+    {
+      "question_id": "anchor_microgel_safety_corpus",
+      "source": "manuals/BioelectronicsLab-S1-SafetyBriefing.pdf",
+      "section": "第 1 页",
+      "must_contain_any": [
+        "Safety Briefing"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 51,
+      "section_match_count": 25
+    },
+    {
+      "question_id": "anchor_wang_explicit",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "mesenchymal stem cells",
+        "3D microgels"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "anchor_title_photothermally",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "785",
+        "laser"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    },
+    {
+      "question_id": "anchor_title_photothermally",
+      "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+      "section": "第",
+      "must_contain_any": [
+        "1.4",
+        "2s"
+      ],
+      "status": "ok",
+      "issues": [],
+      "suggestions": [],
+      "chunk_count": 151,
+      "section_match_count": 151
+    }
+  ],
+  "chroma_sources_loaded": 275,
+  "manifest_sources": 362
+}

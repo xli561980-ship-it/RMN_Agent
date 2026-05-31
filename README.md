@@ -269,14 +269,20 @@ make eval
 本项目现在支持将 Demo 流程拆成可比较的 RAG 实验：
 
 - Retrieval Evaluation：评估 route、answer mode、doc type、recall@k、MRR、nDCG、source coverage 和 paper / SOP 混淆。
+- **Google Embedding Failure Analysis**：解释低 recall@5 来自 embedding、ranking、query anchoring 还是 gold label mismatch（见下方链接）。
+- **Gold evidence alignment check**：`make eval-gold-check` 校验 gold 标签与 Chroma / corpus 是否一致。
+- **扩展 golden questions（30 题）**：覆盖 paper-only、SOP、hybrid、missing evidence、ambiguous anchor 等类型；`make eval-expanded` 生成汇总报告。
 - Generation Evaluation：运行完整 RAG 生成并检查 citation、未知引用、无引用数值声明和证据不足标记。
 - RAGAS Evaluation：可选集成；未安装 `ragas` 或缺少 reference answer 时会生成跳过说明，不影响其他评估。
 - Chunking Benchmark：比较 `fixed`、`header_aware`、`semantic_placeholder`、`parent_child` 等切分策略。
 - Embedding Benchmark：比较 `google`、`openai`、`zhipu`、`huggingface`、`bge_m3`、`e5` 等 provider / 模型。
-- Reranker Benchmark：比较 `none`、`rule`、`cross_encoder`、`bge` 以及可选 API/LLM rerank。
+- Reranker Benchmark：比较 `none`、`rule`、`cross_encoder`、`bge` 以及可选 API/LLM rerank（**rule 默认关闭，仅 ablation**）。
+
+当前发现：**低 recall@5 不一定等于 embedding 模型差**，更常见的是 query anchoring、candidate pool construction 或 gold label design。项目已加入 **anchored retrieval** 与 **gold evidence alignment check**；小型 eval 已扩展为更系统的 golden questions。
 
 详细说明见：
 
+- [Google Embedding Failure Analysis](docs/experiments/google_embedding_failure_analysis.md)
 - `docs/experiments/rag_evaluation.md`
 - `docs/experiments/chunking_experiment.md`
 - `docs/experiments/embedding_benchmark.md`

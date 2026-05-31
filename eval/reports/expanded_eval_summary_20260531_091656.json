@@ -1,0 +1,226 @@
+{
+  "timestamp": "20260531_091656",
+  "question_count": 31,
+  "evidence_count": 69,
+  "category_distribution": {
+    "sop_only": 6,
+    "paper_only": 5,
+    "paper_comparison": 5,
+    "hybrid": 5,
+    "missing_evidence": 5,
+    "ambiguous_anchor": 5
+  },
+  "route_distribution": {
+    "SOP_ONLY": 6,
+    "PAPER_ONLY": 16,
+    "HYBRID": 9
+  },
+  "overall_metrics": {
+    "cases": 31,
+    "successful_cases": 31,
+    "route_accuracy": 0.9354838709677419,
+    "answer_mode_accuracy": 0.7419354838709677,
+    "doc_type_accuracy": 0.9870967741935484,
+    "recall@5": 0.9354838709677419,
+    "recall@10": 0.9354838709677419,
+    "recall@20": 0.967741935483871,
+    "precision@5": 0.7612903225806452,
+    "mrr": 0.8437019969278033,
+    "ndcg@5": 0.996305157470048,
+    "source_coverage": 0.7795698924731183,
+    "sop_boundary_accuracy": 0.967741935483871,
+    "paper_to_sop_confusion_rate": 0.012903225806451613,
+    "avg_retrieval_latency_ms": 7596.228709677419
+  },
+  "category_metrics": {
+    "sop_only": {
+      "count": 6.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "mrr": 1.0,
+      "doc_type_accuracy": 1.0
+    },
+    "paper_only": {
+      "count": 5.0,
+      "recall@5": 0.6,
+      "recall@10": 0.6,
+      "recall@20": 0.8,
+      "mrr": 0.6142857142857143,
+      "doc_type_accuracy": 0.9199999999999999
+    },
+    "paper_comparison": {
+      "count": 5.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "mrr": 1.0,
+      "doc_type_accuracy": 1.0
+    },
+    "hybrid": {
+      "count": 5.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "mrr": 0.7666666666666667,
+      "doc_type_accuracy": 1.0
+    },
+    "missing_evidence": {
+      "count": 5.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "mrr": 0.85,
+      "doc_type_accuracy": 1.0
+    },
+    "ambiguous_anchor": {
+      "count": 5.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "recall@20": 1.0,
+      "mrr": 0.8,
+      "doc_type_accuracy": 1.0
+    }
+  },
+  "failure_analysis": {
+    "issue_types": {
+      "ranking_issue": 4,
+      "recall_issue": 1
+    }
+  },
+  "failure_cases": [
+    {
+      "question_id": "paper_protocol_microgel",
+      "question": "Photothermally powered 3D microgels 这篇论文的完整制备/刺激流程中，当前上下文能支持哪些关键步骤和参数？",
+      "category": "paper_only",
+      "expected_route": "PAPER_ONLY",
+      "predicted_route": "HYBRID",
+      "gold_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf"
+      ],
+      "top_retrieved_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "manuals/Litesizer 500 Instruction Manual .pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "manuals/Litesizer 500 Instruction Manual .pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf"
+      ],
+      "recall@5": 1.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    },
+    {
+      "question_id": "paper_ozkale_toolbox",
+      "question": "Özkale 2024 perspective 论文如何描述 biopolymer microgels 作为 stem cell cultivation tool-box 的价值？",
+      "category": "paper_only",
+      "expected_route": "PAPER_ONLY",
+      "predicted_route": "PAPER_ONLY",
+      "gold_sources": [
+        "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf"
+      ],
+      "top_retrieved_sources": [
+        "papers/1-s2.0-S0142961220307432-main.pdf",
+        "papers/1-s2.0-S0142961220307432-main.pdf",
+        "papers/1-s2.0-S0142961220307432-main.pdf",
+        "papers/1-s2.0-S0142961220307432-main.pdf",
+        "papers/1-s2.0-S0142961220307432-main.pdf"
+      ],
+      "recall@5": 0.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    },
+    {
+      "question_id": "paper_d2lc_actuated",
+      "question": "Actuated 3D microgels for single cell mechanobiology 这篇论文的核心研究对象和应用场景是什么？",
+      "category": "paper_only",
+      "expected_route": "PAPER_ONLY",
+      "predicted_route": "PAPER_ONLY",
+      "gold_sources": [
+        "papers/d2lc00203e1.pdf"
+      ],
+      "top_retrieved_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf"
+      ],
+      "recall@5": 0.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    },
+    {
+      "question_id": "hybrid_fume_hood_solvents",
+      "question": "复现 microgel 制备中涉及 acetic acid、oil phase 或有机溶剂步骤时，BA Fume hood SOP 有哪些操作限制？",
+      "category": "hybrid",
+      "expected_route": "HYBRID",
+      "predicted_route": "SOP_ONLY",
+      "gold_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "manuals/BA Fume hood_eng.pdf"
+      ],
+      "top_retrieved_sources": [
+        "manuals/General Lab Rules MRBL-2.pdf",
+        "manuals/FreeZone Console Freeze Dryers (7343200 Rev F).pdf",
+        "manuals/BA Fume hood_eng.pdf",
+        "manuals/General Lab Rules MRBL-2.pdf",
+        "manuals/BA Fume hood_eng.pdf"
+      ],
+      "recall@5": 1.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    },
+    {
+      "question_id": "missing_microgel_platform_generalization",
+      "question": "这些研究是否足以支持将 photothermal microgel 平台推广到所有 alginate microgel 体系？",
+      "category": "missing_evidence",
+      "expected_route": "PAPER_ONLY",
+      "predicted_route": "PAPER_ONLY",
+      "gold_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+        "papers/d2lc00203e1.pdf"
+      ],
+      "top_retrieved_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf"
+      ],
+      "recall@5": 1.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    },
+    {
+      "question_id": "anchor_corpus_literature",
+      "question": "这些研究是否支持 microgel mechanobiology 在所有 cell type 和 stimulation modality 上都成立？",
+      "category": "ambiguous_anchor",
+      "expected_route": "PAPER_ONLY",
+      "predicted_route": "PAPER_ONLY",
+      "gold_sources": [
+        "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+        "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+        "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+        "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf"
+      ],
+      "top_retrieved_sources": [
+        "papers/d2lc00203e1.pdf",
+        "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+        "papers/smtd202400272-sup-0001-suppmat.docx",
+        "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+        "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf"
+      ],
+      "recall@5": 1.0,
+      "issue_types": [],
+      "possible_cause": "route_or_ranking"
+    }
+  ],
+  "recommendations": [
+    "扩展集整体可接受；下一步继续增加 hard negatives 与 generation/citation eval，而非围绕当前集过拟合。",
+    "若 chunking_boundary_issue 频繁出现：考虑 header-aware / parent-child 对比实验。",
+    "若 gold_label_mismatch 出现：用 eval-gold-check 修正标签，而非改 retrieval 逻辑刷分。"
+  ],
+  "retrieval_eval_json": "/Users/xds_mac/Library/CloudStorage/OneDrive-TUM/cursorgitrmn/RMN_Agent/eval/reports/retrieval_eval_20260531_090008.json",
+  "gold_alignment_json": ""
+}

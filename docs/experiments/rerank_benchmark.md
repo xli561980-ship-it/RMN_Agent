@@ -15,6 +15,12 @@
 
 因此默认配置为 `RERANKER_PROVIDER=none`。`RERANK_RULE_WEIGHT=0.35` 等参数保留，仅供实验对比。
 
+**诊断边界**：
+
+- `forced_gold_source_anchor` 只能在 `eval/run_query_anchor_ablation.py` 中使用；
+- corpus-level 问题不应自动锚定到 Wang 2025 等单篇 source；
+- gold evidence 标签必须与问题语义一致（见 `make eval-gold-check`）。
+
 当前优先改进：**query anchoring**（`paper_scope_*` + anchored retrieval）与 **HYBRID 候选池扩大**（paper/SOP topN ≥ 20）。
 
 ## 如何运行

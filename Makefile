@@ -1,7 +1,7 @@
 PYTHON ?= .venv/bin/python
 STREAMLIT ?= .venv/bin/streamlit
 
-.PHONY: test smoke eval eval-retrieval eval-generation eval-ragas eval-all bench-chunking bench-embedding bench-rerank ingest rebuild app catalog sample
+.PHONY: test smoke eval eval-retrieval eval-generation eval-ragas eval-all eval-gold-check eval-expanded bench-chunking bench-embedding bench-rerank ingest rebuild app catalog sample
 
 test:
 	$(PYTHON) -m unittest discover -s tests -v
@@ -15,6 +15,12 @@ eval:
 
 eval-retrieval:
 	$(PYTHON) eval/run_retrieval_eval.py --questions eval/golden_questions.jsonl
+
+eval-gold-check:
+	$(PYTHON) eval/check_gold_evidence_alignment.py
+
+eval-expanded:
+	$(PYTHON) eval/run_expanded_eval_summary.py
 
 eval-generation:
 	$(PYTHON) eval/run_generation_eval.py --questions eval/golden_questions.jsonl

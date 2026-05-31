@@ -7,7 +7,9 @@ RMN Agent 的核心风险不是“答不上来”，而是论文证据、SOP 约
 ## 如何运行
 
 ```bash
+make eval-gold-check
 make eval-retrieval
+make eval-expanded
 make eval-generation
 make eval-ragas
 make eval-all
@@ -16,8 +18,20 @@ make eval-all
 也可以直接运行：
 
 ```bash
+python eval/check_gold_evidence_alignment.py
 python eval/run_retrieval_eval.py --questions eval/golden_questions.jsonl --k 5
+python eval/run_expanded_eval_summary.py
 ```
+
+## 默认 pipeline 与诊断边界
+
+- **Rule reranker 默认关闭**（`RERANKER_PROVIDER=none`）；`rule` 仅用于 benchmark / ablation。
+- **Anchored retrieval 默认启用**（`ANCHORED_PAPER_RETRIEVAL=true`）。
+- **`forced_gold_source_anchor` 仅**在 `eval/run_query_anchor_ablation.py` 中用于诊断，不进入默认 pipeline。
+- **Corpus-level 问题**（如「这些文献 / 所有干细胞类型」）不应自动锚定到单篇论文。
+- **Gold evidence 设计必须与问题语义一致**；用 `make eval-gold-check` 校验 source / section / keywords。
+
+扩展实验文档：[Google Embedding Failure Analysis](google_embedding_failure_analysis.md)
 
 ## 输出文件
 

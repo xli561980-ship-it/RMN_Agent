@@ -100,6 +100,38 @@ class TestPaperAnchor(unittest.TestCase):
         self.assertTrue(has_strong_paper_anchor_signal("Wang 2025 microgel protocol"))
         self.assertFalse(has_strong_paper_anchor_signal("这些文献里的 microgel 方法"))
 
+    def test_corpus_level_phrases_no_auto_anchor(self) -> None:
+        for q in [
+            "这些文献是否证明了 microgel 方法有效？",
+            "所有干细胞类型是否都适用？",
+            "这些研究是否支持 universal microgel platform？",
+        ]:
+            with self.subTest(query=q):
+                self.assertTrue(is_corpus_level_question(q))
+                analysis = enrich_analysis_with_paper_anchor(
+                    {"intent": "PAPER_ONLY", "paper_scope_source": None},
+                    q,
+                    paper_anchor=None,
+                )
+                self.assertIsNone(analysis.get("paper_scope_source"))
+
+    def test_no_ui_no_strong_signal_does_not_lock_source(self) -> None:
+        q = "microgel 文献里的制备参数有哪些？"
+        self.assertFalse(has_strong_paper_anchor_signal(q))
+        analysis = enrich_analysis_with_paper_anchor({}, q, paper_anchor=None)
+        self.assertIsNone(analysis.get("paper_scope_source"))
+
+    def test_ui_anchor_resolves_deictic_this_paper(self) -> None:
+        ui = WANG_SOURCE
+        q = "这篇论文的方法可以直接照做吗？"
+        analysis = enrich_analysis_with_paper_anchor({}, q, paper_anchor=ui)
+        self.assertEqual(analysis.get("paper_scope_source"), ui)
+
+    def test_title_photothermally_resolves_wang(self) -> None:
+        q = "Photothermally Powered 3D Microgels 的 laser 参数"
+        analysis = enrich_analysis_with_paper_anchor({"intent": "PAPER_ONLY"}, q)
+        self.assertEqual(analysis.get("paper_scope_source"), WANG_SOURCE)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -36,7 +36,7 @@ _ENTITY_EXTRACT_RE = re.compile(
 )
 
 _CORPUS_LEVEL_RE = re.compile(
-    r"(这些文献|多篇|语料|corpus|literature|papers?\s+(show|prove|demonstrate)|"
+    r"(这些文献|这些研究|多篇|语料|corpus|literature|papers?\s+(show|prove|demonstrate)|"
     r"所有(?:干细胞|细胞)类型|across\s+all\s+stem\s+cell)",
     flags=re.IGNORECASE,
 )
