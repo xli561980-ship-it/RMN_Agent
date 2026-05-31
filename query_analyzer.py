@@ -24,8 +24,9 @@ try:
 except ImportError:  # pragma: no cover
     ChatGoogleGenerativeAI = None  # type: ignore
 
-load_dotenv()
+from paper_anchor import enrich_analysis_with_paper_anchor, extract_paper_entities, references_paper_deictically
 
+load_dotenv()
 
 _PROCEDURE_TERMS = (
     "protocol",
@@ -146,6 +147,13 @@ class QueryAnalysisModel(BaseModel):
             "`paper_scope_source`, or `paper_scope_project_id`. Do NOT guess near-miss titles (punctuation/case differences)."
         ),
     )
+    paper_scope_source_hint: Optional[str] = Field(
+        default=None,
+        description=(
+            "Soft title/source hint when the user names a distinctive phrase (author+year, photothermal microgel, etc.) "
+            "but not an exact metadata title or file path."
+        ),
+    )
     requires_full_protocol: bool = Field(
         default=False,
         description=(
@@ -165,6 +173,7 @@ def normalize_analysis(raw: Dict[str, Any]) -> Dict[str, Any]:
     out.setdefault("paper_scope_source", None)
     out.setdefault("paper_scope_project_id", None)
     out.setdefault("paper_scope_paper_title", None)
+    out.setdefault("paper_scope_source_hint", None)
     out.setdefault("requires_full_protocol", False)
     sq = out.get("search_queries")
     if not isinstance(sq, dict):
@@ -186,6 +195,7 @@ def _empty_analysis() -> Dict[str, Any]:
             "paper_scope_source": None,
             "paper_scope_project_id": None,
             "paper_scope_paper_title": None,
+            "paper_scope_source_hint": None,
             "requires_full_protocol": False,
             "search_queries": {"sop_query": "", "paper_query": ""},
         }
@@ -246,30 +256,35 @@ def heuristic_analyze_query(user_query: str, *, paper_anchor: Optional[str] = No
         answer_mode = "HYBRID"
 
     source = _extract_possible_paper_source(text)
-    if not source and (paper_anchor or "").strip():
-        source = paper_anchor.strip()
+    title_hint = extract_paper_entities(text)
+    anchor = (paper_anchor or "").strip()
+    if anchor and (references_paper_deictically(text) or not source):
+        source = anchor
 
-    entities = []
-    for token in re.findall(r"[A-Za-z][A-Za-z0-9+\-_/]{2,}|[\u4e00-\u9fff]{2,}", text):
-        if token.lower() not in {"what", "how", "the", "and", "for", "with"}:
-            entities.append(token)
-        if len(entities) >= 8:
-            break
+    entities = list(title_hint)
 
-    return normalize_analysis(
-        {
-            "entities": entities,
-            "intent": intent,
-            "answer_mode": answer_mode,
-            "paper_scope_source": source,
-            "paper_scope_project_id": None,
-            "paper_scope_paper_title": None,
-            "requires_full_protocol": wants_procedure,
-            "search_queries": {
-                "sop_query": f"{text} SOP safety standard procedure manual",
-                "paper_query": f"{text} paper methods parameters results",
-            },
-        }
+    return enrich_analysis_with_paper_anchor(
+        _apply_route_guards(
+            normalize_analysis(
+                {
+                    "entities": entities,
+                    "intent": intent,
+                    "answer_mode": answer_mode,
+                    "paper_scope_source": source,
+                    "paper_scope_project_id": None,
+                    "paper_scope_paper_title": title_hint[0] if title_hint else None,
+                    "paper_scope_source_hint": title_hint[0] if title_hint else None,
+                    "requires_full_protocol": wants_procedure,
+                    "search_queries": {
+                        "sop_query": f"{text} SOP safety standard procedure manual",
+                        "paper_query": f"{text} paper methods parameters results",
+                    },
+                }
+            ),
+            text,
+        ),
+        text,
+        paper_anchor=paper_anchor,
     )
 
 
@@ -316,7 +331,8 @@ def analyze_query(user_query: str, *, paper_anchor: Optional[str] = None) -> Dic
     structured = llm.with_structured_output(QueryAnalysisModel)
     anchor_line = (
         f"\n[UI-anchored paper path (if selected): {paper_anchor}]\n"
-        "If this anchor is relevant to the question, set paper_scope_source to exactly this path string; otherwise ignore it."
+        "If the user refers to “这篇论文 / 参考论文 / this paper” and this anchor is set, you MUST set paper_scope_source "
+        "to exactly this path. Otherwise use it only when clearly relevant."
         if (paper_anchor or "").strip()
         else ""
     )
@@ -332,8 +348,8 @@ def analyze_query(user_query: str, *, paper_anchor: Optional[str] = None) -> Dic
         "   - HYBRID: both scholarly and potentially executable aspects.\n"
         "3) paper_scope_*: Use ONLY when you can lock a single paper without brittle string guessing.\n"
         "   - If the user mentions a filename (with .pdf), basename, or path, set paper_scope_source to papers/<filename>.\n"
-        "   - Set paper_scope_paper_title ONLY when the title is certainly the same string as stored metadata.paper_title "
-        "(or the user pasted a DOI / file path); otherwise leave it null and let retrieval use embeddings + source/project hints.\n"
+        "   - Set paper_scope_paper_title or paper_scope_source_hint when the user names distinctive entities "
+        "(e.g. Wang 2025, Photothermally Powered, 3D Microgels, microfluidic fabrication) even if not an exact metadata title.\n"
         "   - project_id when explicitly stated or unambiguous.\n"
         "4) requires_full_protocol: true only when the user explicitly wants exhaustive step-by-step lab / synthesis / "
         "fabrication / replication detail (not a short summary); false otherwise.\n"
@@ -351,7 +367,7 @@ def analyze_query(user_query: str, *, paper_anchor: Optional[str] = None) -> Dic
         parsed = QueryAnalysisModel.model_validate(result)
     else:
         parsed = QueryAnalysisModel.model_validate(result)
-    return _apply_route_guards(parsed.model_dump(), text)
+    return enrich_analysis_with_paper_anchor(_apply_route_guards(parsed.model_dump(), text), text, paper_anchor=paper_anchor)
 
 
 def analyze_query_json(user_query: str, *, paper_anchor: Optional[str] = None) -> str:

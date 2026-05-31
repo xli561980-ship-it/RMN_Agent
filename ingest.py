@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import shutil
@@ -71,6 +72,8 @@ except ImportError:  # pragma: no cover
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from chunking import ChunkingConfig, split_document
+
 
 # =============================================================================
 # 路径与超参数
@@ -87,12 +90,18 @@ CORPUS_MANIFEST_JSON = Path(__file__).resolve().parent / "corpus_manifest.json"
 # 当前支持的文档扩展名（小写，含点）
 INGEST_SUPPORTED_SUFFIXES = frozenset({".pdf", ".docx"})
 
-# 论文：较小 chunk，便于参数级检索
-PAPER_CHUNK_SIZE = 800
-PAPER_CHUNK_OVERLAP = 150
-# 手册：较大 chunk，尽量保留完整操作步骤
-SOP_CHUNK_SIZE = int(os.getenv("SOP_CHUNK_SIZE", "1200"))
-SOP_CHUNK_OVERLAP = int(os.getenv("SOP_CHUNK_OVERLAP", "200"))
+# 论文 / SOP：可配置 chunking，默认保留原有 header-aware 思路并让 SOP 走 parent-child。
+CHUNK_STRATEGY = os.getenv("CHUNK_STRATEGY", "header_aware")
+PAPER_CHUNK_STRATEGY = os.getenv("PAPER_CHUNK_STRATEGY", CHUNK_STRATEGY or "header_aware")
+SOP_CHUNK_STRATEGY = os.getenv("SOP_CHUNK_STRATEGY", CHUNK_STRATEGY or "parent_child")
+PAPER_CHUNK_SIZE = int(os.getenv("PAPER_CHUNK_SIZE", "900"))
+PAPER_CHUNK_OVERLAP = int(os.getenv("PAPER_CHUNK_OVERLAP", "150"))
+SOP_CHILD_CHUNK_SIZE = int(os.getenv("SOP_CHILD_CHUNK_SIZE", os.getenv("SOP_CHUNK_SIZE", "500")))
+SOP_CHILD_CHUNK_OVERLAP = int(os.getenv("SOP_CHILD_CHUNK_OVERLAP", os.getenv("SOP_CHUNK_OVERLAP", "80")))
+SOP_PARENT_CHUNK_SIZE = int(os.getenv("SOP_PARENT_CHUNK_SIZE", "1800"))
+SOP_PARENT_CHUNK_OVERLAP = int(os.getenv("SOP_PARENT_CHUNK_OVERLAP", "200"))
+SOP_CHUNK_SIZE = SOP_CHILD_CHUNK_SIZE
+SOP_CHUNK_OVERLAP = SOP_CHILD_CHUNK_OVERLAP
 
 INGEST_METADATA_EXCERPT_CHARS = int(os.getenv("INGEST_METADATA_EXCERPT_CHARS", "14000"))
 
@@ -101,6 +110,30 @@ HEADERS_TO_SPLIT_ON: List[tuple[str, str]] = [
     ("##", "Header 2"),
     ("###", "Header 3"),
 ]
+
+
+class LocalHashEmbeddings:
+    """Small deterministic embedding fallback for offline tests and smoke benchmarks."""
+
+    def __init__(self, dimensions: int = 384) -> None:
+        self.dimensions = max(16, int(dimensions))
+
+    def _embed(self, text: str) -> List[float]:
+        vec = [0.0] * self.dimensions
+        tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9+\-_/]{1,}|[\u4e00-\u9fff]{2,}", text or "")
+        for token in tokens:
+            digest = hashlib.md5(token.casefold().encode("utf-8")).digest()
+            idx = int.from_bytes(digest[:4], "little") % self.dimensions
+            sign = 1.0 if digest[4] % 2 == 0 else -1.0
+            vec[idx] += sign
+        norm = math.sqrt(sum(x * x for x in vec)) or 1.0
+        return [x / norm for x in vec]
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [self._embed(t) for t in texts]
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._embed(text)
 
 
 def pdf_source_key(file_path: Path) -> str:
@@ -681,6 +714,7 @@ def hierarchical_chunk_markdown_segment(
     recursive_splitter: RecursiveCharacterTextSplitter,
     *,
     global_file_metadata: Optional[Dict[str, Any]] = None,
+    chunking_config: Optional[ChunkingConfig] = None,
 ) -> List[Document]:
     """
     双层切分：Markdown 标题 → 递归字数。
@@ -695,21 +729,35 @@ def hierarchical_chunk_markdown_segment(
         "source": segment.metadata.get("source", ""),
         "page": segment.metadata.get("page", 1),
     }
-    section_docs = header_splitter.split_text(segment.page_content)
-    final_chunks: List[Document] = []
-    for sec in section_docs:
-        merged_meta = {**base, **(sec.metadata or {})}
-        merged_meta = _clean_metadata(merged_meta)
-        section_limit = int(getattr(recursive_splitter, "_chunk_size", 800))
-        if len(sec.page_content) <= section_limit:
-            final_chunks.append(Document(page_content=sec.page_content, metadata=merged_meta))
-            continue
-        parent = Document(page_content=sec.page_content, metadata=merged_meta)
-        sub_list = recursive_splitter.split_documents([parent])
-        final_chunks.extend(sub_list)
+    if chunking_config is None:
+        chunking_config = ChunkingConfig(
+            strategy="header_aware",
+            chunk_size=int(getattr(recursive_splitter, "_chunk_size", PAPER_CHUNK_SIZE)),
+            chunk_overlap=int(getattr(recursive_splitter, "_chunk_overlap", PAPER_CHUNK_OVERLAP)),
+        )
+    base_doc = Document(page_content=segment.page_content, metadata=base)
+    try:
+        final_chunks = split_document(base_doc, chunking_config)
+    except Exception as exc:
+        print(f"[警告] chunking strategy={chunking_config.strategy} 失败，回退旧 header-aware 切分：{exc}", file=sys.stderr)
+        section_docs = header_splitter.split_text(segment.page_content)
+        final_chunks = []
+        for sec in section_docs:
+            merged_meta = {**base, **(sec.metadata or {})}
+            merged_meta = _clean_metadata(merged_meta)
+            section_limit = int(getattr(recursive_splitter, "_chunk_size", 800))
+            if len(sec.page_content) <= section_limit:
+                final_chunks.append(Document(page_content=sec.page_content, metadata=merged_meta))
+                continue
+            parent = Document(page_content=sec.page_content, metadata=merged_meta)
+            final_chunks.extend(recursive_splitter.split_documents([parent]))
     out: List[Document] = []
     for c in final_chunks:
         md = _clean_metadata(dict(c.metadata))
+        md.setdefault("chunk_strategy", chunking_config.strategy)
+        md.setdefault("chunk_index", len(out))
+        md.setdefault("section_title", str(md.get("Header 3") or md.get("Header 2") or md.get("Header 1") or "Untitled"))
+        md.setdefault("section_type", "other")
         body = c.page_content or ""
         if md.get("doc_type") == "paper":
             body = _paper_embedding_prefix_line(md) + body
@@ -725,6 +773,9 @@ def hierarchical_chunk_markdown_segment(
 
 def build_embeddings():
     provider = (os.getenv("EMBEDDING_PROVIDER") or "google").lower().strip()
+
+    if provider in ("local_hash", "hash", "offline"):
+        return LocalHashEmbeddings(int(os.getenv("LOCAL_HASH_EMBEDDING_DIM", "384")))
 
     if provider in ("google", "gemini"):
         if GoogleGenerativeAIEmbeddings is None:
@@ -748,11 +799,17 @@ def build_embeddings():
             openai_api_base=os.getenv("ZHIPU_OPENAI_BASE", "https://open.bigmodel.cn/api/paas/v4/"),
         )
 
-    if provider == "huggingface":
+    if provider in ("huggingface", "bge_m3", "e5"):
         if HuggingFaceEmbeddings is None:
             raise ValueError("未安装 sentence-transformers / langchain-community，无法使用 huggingface 嵌入。")
-        model_name = os.getenv("HF_EMBEDDING_MODEL", "BAAI/bge-large-zh-v1.5")
-        return HuggingFaceEmbeddings(model_name=model_name)
+        if provider == "bge_m3":
+            model_name = os.getenv("HF_EMBEDDING_MODEL") or os.getenv("BGE_M3_EMBEDDING_MODEL", "BAAI/bge-m3")
+        elif provider == "e5":
+            model_name = os.getenv("E5_EMBEDDING_MODEL", "intfloat/multilingual-e5-base")
+        else:
+            model_name = os.getenv("HF_EMBEDDING_MODEL", "BAAI/bge-large-zh-v1.5")
+        normalize = (os.getenv("EMBEDDING_NORMALIZE", "true") or "").lower() not in ("0", "false", "no")
+        return HuggingFaceEmbeddings(model_name=model_name, encode_kwargs={"normalize_embeddings": normalize})
 
     if provider == "openai":
         if not os.getenv("OPENAI_API_KEY"):
@@ -1069,6 +1126,7 @@ def _process_single_pdf_to_chunks(
     global_file_metadata: Dict[str, Any],
     *,
     source_key: str,
+    chunking_config: Optional[ChunkingConfig] = None,
 ) -> List[Document]:
     segments = load_document_markdown_segments(file_path, source_key)
     chunks: List[Document] = []
@@ -1079,6 +1137,7 @@ def _process_single_pdf_to_chunks(
                 header_splitter,
                 recursive_splitter,
                 global_file_metadata=global_file_metadata,
+                chunking_config=chunking_config,
             )
         )
     return chunks
@@ -1151,6 +1210,21 @@ def ingest_all_pdfs() -> int:
     header_splitter = _build_markdown_header_splitter()
     paper_recursive = _build_recursive_splitter(PAPER_CHUNK_SIZE, PAPER_CHUNK_OVERLAP)
     sop_recursive = _build_recursive_splitter(SOP_CHUNK_SIZE, SOP_CHUNK_OVERLAP)
+    paper_chunking = ChunkingConfig(
+        strategy=PAPER_CHUNK_STRATEGY,
+        chunk_size=PAPER_CHUNK_SIZE,
+        chunk_overlap=PAPER_CHUNK_OVERLAP,
+    )
+    sop_chunking = ChunkingConfig(
+        strategy=SOP_CHUNK_STRATEGY,
+        chunk_size=SOP_CHILD_CHUNK_SIZE,
+        chunk_overlap=SOP_CHILD_CHUNK_OVERLAP,
+        child_chunk_size=SOP_CHILD_CHUNK_SIZE,
+        child_chunk_overlap=SOP_CHILD_CHUNK_OVERLAP,
+        parent_chunk_size=SOP_PARENT_CHUNK_SIZE,
+        parent_chunk_overlap=SOP_PARENT_CHUNK_OVERLAP,
+    )
+    print(f"Chunking: paper={paper_chunking.strategy} ({PAPER_CHUNK_SIZE}/{PAPER_CHUNK_OVERLAP}), sop={sop_chunking.strategy}")
     total_new_chunks = 0
 
     # ---------- 论文（papers/）：单元 + SI ----------
@@ -1210,6 +1284,7 @@ def ingest_all_pdfs() -> int:
                     paper_recursive,
                     meta_main,
                     source_key=mk,
+                    chunking_config=paper_chunking,
                 )
                 if ch:
                     vectorstore.add_documents(ch)
@@ -1253,6 +1328,7 @@ def ingest_all_pdfs() -> int:
                     paper_recursive,
                     meta_extra_main,
                     source_key=ek,
+                    chunking_config=paper_chunking,
                 )
                 if ch_extra:
                     vectorstore.add_documents(ch_extra)
@@ -1290,7 +1366,7 @@ def ingest_all_pdfs() -> int:
                 }
                 sk = pdf_source_key(si_path)
                 ch_si = _process_single_pdf_to_chunks(
-                    si_path, header_splitter, paper_recursive, meta_si, source_key=sk
+                    si_path, header_splitter, paper_recursive, meta_si, source_key=sk, chunking_config=paper_chunking
                 )
                 if ch_si:
                     vectorstore.add_documents(ch_si)
@@ -1325,7 +1401,7 @@ def ingest_all_pdfs() -> int:
         try:
             meta_sop = build_sop_global_metadata(path)
             ch = _process_single_pdf_to_chunks(
-                path, header_splitter, sop_recursive, meta_sop, source_key=sk
+                path, header_splitter, sop_recursive, meta_sop, source_key=sk, chunking_config=sop_chunking
             )
             if ch:
                 vectorstore.add_documents(ch)

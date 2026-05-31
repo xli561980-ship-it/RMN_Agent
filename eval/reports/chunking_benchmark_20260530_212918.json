@@ -1,0 +1,50 @@
+{
+  "rows": [
+    {
+      "strategy": "fixed",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 530,
+      "avg_chunk_chars": 605.7,
+      "paper_chunks": 228,
+      "sop_chunks": 302,
+      "recall@5": 0.88,
+      "mrr": 1.0,
+      "doc_type_accuracy": 1.0,
+      "citation_coverage_if_available": 0.9
+    },
+    {
+      "strategy": "header_aware",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 530,
+      "avg_chunk_chars": 605.7,
+      "paper_chunks": 228,
+      "sop_chunks": 302,
+      "recall@5": 0.88,
+      "mrr": 1.0,
+      "doc_type_accuracy": 1.0,
+      "citation_coverage_if_available": 0.9
+    },
+    {
+      "strategy": "parent_child",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 530,
+      "avg_chunk_chars": 605.7,
+      "paper_chunks": 228,
+      "sop_chunks": 302,
+      "recall@5": 0.88,
+      "mrr": 1.0,
+      "doc_type_accuracy": 1.0,
+      "citation_coverage_if_available": 0.9
+    }
+  ],
+  "k": 5,
+  "preflight_warnings": [
+    "未发现 corpus_manifest.json；看起来还没有完成可复现入库。"
+  ]
+}

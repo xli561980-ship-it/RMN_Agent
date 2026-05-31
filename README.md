@@ -191,7 +191,7 @@ RMN_Agent/
 - `sample_chroma_snippets.py`：抽样查看 Chroma chunk，便于检查入库效果。
 - `data/papers/`：放置本地论文、正文或补充材料。
 - `data/manuals/`：放置本地 SOP、设备手册或操作说明。
-- `eval/`：检索烟测问题和评估脚本。
+- `eval/`：检索烟测问题、gold evidence、评估脚本与 [`eval/reports/`](eval/reports/) 实验报告。
 - `tests/`：不依赖真实客户数据的基础单元测试。
 - `docs/`：架构说明、演示脚本和作品集定位说明。
 
@@ -264,6 +264,24 @@ make eval
 
 `make smoke` 和 `make eval` 会依赖本地 Chroma 内容。若没有先完成入库，相关检查可能无法得到有意义结果。
 
+## RAG 实验与评估
+
+本项目现在支持将 Demo 流程拆成可比较的 RAG 实验：
+
+- Retrieval Evaluation：评估 route、answer mode、doc type、recall@k、MRR、nDCG、source coverage 和 paper / SOP 混淆。
+- Generation Evaluation：运行完整 RAG 生成并检查 citation、未知引用、无引用数值声明和证据不足标记。
+- RAGAS Evaluation：可选集成；未安装 `ragas` 或缺少 reference answer 时会生成跳过说明，不影响其他评估。
+- Chunking Benchmark：比较 `fixed`、`header_aware`、`semantic_placeholder`、`parent_child` 等切分策略。
+- Embedding Benchmark：比较 `google`、`openai`、`zhipu`、`huggingface`、`bge_m3`、`e5` 等 provider / 模型。
+- Reranker Benchmark：比较 `none`、`rule`、`cross_encoder`、`bge` 以及可选 API/LLM rerank。
+
+详细说明见：
+
+- `docs/experiments/rag_evaluation.md`
+- `docs/experiments/chunking_experiment.md`
+- `docs/experiments/embedding_benchmark.md`
+- `docs/experiments/rerank_benchmark.md`
+
 ## 9. 示例问题
 
 - `这篇 microgel 论文使用了哪些关键制备步骤和实验参数？请按证据来源回答。`
@@ -322,6 +340,7 @@ make eval
 
 ## 14. 相关文档
 
+- [变更日志](docs/CHANGELOG.md)：每一版调整内容与量化效果（含 eval 报告链接）。
 - [架构说明](docs/architecture.md)：说明模块关系、数据流、关键设计选择和当前限制。
 - [演示脚本](docs/demo_script.md)：用于准备面试或项目展示时的讲解顺序。
 - [作品集定位](docs/presales_positioning.md)：说明如何克制地把项目能力映射到 AI Agent / RAG / 解决方案表达能力。

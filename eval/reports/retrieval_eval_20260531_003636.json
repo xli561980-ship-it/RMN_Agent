@@ -1,0 +1,77 @@
+{
+  "metrics": {
+    "cases": 5,
+    "successful_cases": 1,
+    "route_accuracy": 1.0,
+    "answer_mode_accuracy": 1.0,
+    "doc_type_accuracy": 0.0,
+    "recall@5": 0.0,
+    "precision@5": 0.0,
+    "mrr": 0.0,
+    "ndcg@5": 0.0,
+    "source_coverage": 0.0,
+    "sop_boundary_accuracy": 0.0,
+    "paper_to_sop_confusion_rate": 0.0,
+    "avg_retrieval_latency_ms": 4190.41
+  },
+  "cases": [
+    {
+      "id": "sop_litesizer_basic",
+      "question": "Litesizer 500 做温度序列测量时，平衡时间有什么要求？",
+      "expected_route": "SOP_ONLY",
+      "predicted_route": "SOP_ONLY",
+      "expected_answer_mode": "OPERATIONAL",
+      "predicted_answer_mode": "OPERATIONAL",
+      "expected_doc_types": [
+        "sop"
+      ],
+      "top_sources": [],
+      "top_doc_types": [],
+      "route_ok": true,
+      "answer_mode_ok": true,
+      "doc_type_accuracy": 0.0,
+      "recall@k": 0.0,
+      "precision@k": 0.0,
+      "mrr": 0.0,
+      "ndcg@k": 0.0,
+      "source_coverage": 0.0,
+      "sop_boundary_ok": false,
+      "paper_to_sop_confusion_rate": 0.0,
+      "gold_hit": false,
+      "missing_gold_sources": [
+        "manuals/Litesizer 500 Instruction Manual .pdf"
+      ],
+      "latency_ms": 4190.41,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "id": "paper_protocol_microgel",
+      "question": "Photothermally powered 3D microgels 这篇论文的完整制备/刺激流程中，当前上下文能支持哪些关键步骤和参数？",
+      "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+      "ok": false
+    },
+    {
+      "id": "hybrid_replicate_safety",
+      "question": "如果我要参考论文里的 microgel 参数做一次实验，需要同时注意哪些本实验室 SOP 或安全限制？",
+      "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+      "ok": false
+    },
+    {
+      "id": "paper_compare",
+      "question": "对比两篇关于 3D microgels mechanical stimulation 的论文，刺激方式、时间和细胞响应有什么差异？",
+      "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+      "ok": false
+    },
+    {
+      "id": "missing_evidence",
+      "question": "这些文献是否证明了该 microgel 方法在所有干细胞类型中都有效？",
+      "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+      "ok": false
+    }
+  ],
+  "warnings": [
+    "sop_litesizer_basic: gold_sources not found in retrieved Chroma results: manuals/Litesizer 500 Instruction Manual .pdf"
+  ],
+  "k": 5
+}

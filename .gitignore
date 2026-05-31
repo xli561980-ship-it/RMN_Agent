@@ -9,18 +9,22 @@ __pycache__/
 .ruff_cache/
 
 # Local/runtime artifacts
+.cache/
 chroma_db/
 processed_files.json
 corpus_manifest.json
 processed_files.json.tmp
 corpus_manifest.json.tmp
 
-# Large/private corpora and generated exports should be handled explicitly.
-# Keep these ignored for publishable copies; remove locally only when needed.
+# Generated exports at repo root; keep eval experiment reports versioned.
+/reports/
+!eval/reports/
+!eval/reports/**
+
+# Large/private corpora should stay out of git; keep directory placeholders.
 data/papers/*
 !data/papers/.gitkeep
 data/manuals/*
 !data/manuals/.gitkeep
 data/private/
 outputs/
-reports/

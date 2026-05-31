@@ -1,0 +1,65 @@
+{
+  "rows": [
+    {
+      "embedding_provider": "local_hash",
+      "embedding_model": "local_hash_dim_384",
+      "skipped": false,
+      "recall@5": 0.88,
+      "precision@5": 0.88,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "doc_type_accuracy": 1.0,
+      "sop_boundary_accuracy": 0.8,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_retrieval_latency_ms": 72.604,
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "notes": "未传入 --rebuild，未重建索引；指标反映当前 Chroma。",
+      "rebuilt": false
+    },
+    {
+      "embedding_provider": "google",
+      "embedding_model": "gemini-embedding-001",
+      "skipped": true,
+      "notes": "provider skipped: missing GOOGLE_API_KEY/GEMINI_API_KEY"
+    },
+    {
+      "embedding_provider": "bge_m3",
+      "embedding_model": "BAAI/bge-m3",
+      "skipped": false,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "doc_type_accuracy": 0.0,
+      "sop_boundary_accuracy": 0.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_retrieval_latency_ms": 0.0,
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "notes": "未传入 --rebuild，未重建索引；指标反映当前 Chroma。",
+      "rebuilt": false
+    },
+    {
+      "embedding_provider": "e5",
+      "embedding_model": "intfloat/multilingual-e5-base",
+      "skipped": false,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "doc_type_accuracy": 0.0,
+      "sop_boundary_accuracy": 0.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_retrieval_latency_ms": 0.0,
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "notes": "未传入 --rebuild，未重建索引；指标反映当前 Chroma。",
+      "rebuilt": false
+    }
+  ],
+  "k": 5,
+  "preflight_warnings": [
+    "未发现 corpus_manifest.json；看起来还没有完成可复现入库。"
+  ]
+}
