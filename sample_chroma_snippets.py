@@ -23,9 +23,11 @@ from pathlib import Path
 import chromadb
 from dotenv import load_dotenv
 
+ROOT = Path(__file__).resolve().parent
+
 
 def _persist_and_collection() -> tuple[Path, str]:
-    load_dotenv()
+    load_dotenv(ROOT / ".env")
     persist = Path(os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")).resolve()
     name = os.getenv("CHROMA_COLLECTION_NAME", "lab_literature_rag")
     return persist, name

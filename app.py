@@ -16,7 +16,8 @@ from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 from citation_validator import validate_answer_citations
 from ingest import DATA_MANUALS_DIR, DATA_PAPERS_DIR, is_supported_ingest_file
@@ -28,8 +29,6 @@ from rag_core import (
     stream_fusion_rag_from_bundle,
 )
 
-
-ROOT = Path(__file__).resolve().parent
 
 ANCHOR_NONE_LABEL = "(None — all papers in library)"
 

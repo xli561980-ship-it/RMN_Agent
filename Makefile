@@ -1,7 +1,7 @@
 PYTHON ?= .venv/bin/python
 STREAMLIT ?= .venv/bin/streamlit
 
-.PHONY: test smoke eval eval-retrieval eval-generation eval-ragas eval-all eval-gold-check eval-expanded bench-chunking bench-embedding bench-rerank ingest rebuild app catalog sample
+.PHONY: test smoke eval eval-retrieval eval-generation eval-ragas eval-all eval-gold-check eval-expanded bench-chunking bench-embedding bench-embedding-local bench-embedding-hf bench-rerank bench-rerank-hf ingest rebuild app catalog sample
 
 test:
 	$(PYTHON) -m unittest discover -s tests -v
@@ -35,10 +35,19 @@ bench-chunking:
 	$(PYTHON) eval/run_chunking_benchmark.py --strategies fixed,header_aware,parent_child
 
 bench-embedding:
-	$(PYTHON) eval/run_embedding_benchmark.py --providers google,bge_m3,e5
+	$(PYTHON) eval/run_embedding_benchmark.py --providers google
+
+bench-embedding-local:
+	$(PYTHON) eval/run_embedding_benchmark.py --providers local_hash
+
+bench-embedding-hf:
+	$(PYTHON) eval/run_embedding_benchmark.py --providers bge_m3,e5
 
 bench-rerank:
-	$(PYTHON) eval/run_rerank_benchmark.py --rerankers none,rule,bge
+	$(PYTHON) eval/run_rerank_benchmark.py --rerankers none,rule
+
+bench-rerank-hf:
+	$(PYTHON) eval/run_rerank_benchmark.py --rerankers bge
 
 ingest:
 	$(PYTHON) ingest.py

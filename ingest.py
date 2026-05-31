@@ -40,7 +40,8 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
 
 from dotenv import load_dotenv
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document

@@ -15,6 +15,7 @@ import os
 import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from dotenv import load_dotenv
@@ -41,7 +42,8 @@ from paper_anchor import (
 from query_analyzer import analyze_query, normalize_analysis
 from rerankers import rerank_documents, rerank_dual_path
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 logger = logging.getLogger(__name__)
 

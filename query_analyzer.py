@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import os
 import re
+from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
@@ -26,7 +27,8 @@ except ImportError:  # pragma: no cover
 
 from paper_anchor import enrich_analysis_with_paper_anchor, extract_paper_entities, references_paper_deictically
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 _PROCEDURE_TERMS = (
     "protocol",

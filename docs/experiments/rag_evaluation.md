@@ -4,6 +4,8 @@
 
 RMN Agent 的核心风险不是“答不上来”，而是论文证据、SOP 约束和引用线索混淆。评估框架把 retrieval、generation 与可选 RAGAS 拆开，便于比较不同检索、切分、embedding 和 reranker 配置。
 
+当前扩展 golden set：**31 questions / 69 gold evidence**（paper-only、paper comparison、SOP-only、hybrid、missing evidence、ambiguous anchor）。
+
 ## 如何运行
 
 ```bash
@@ -21,11 +23,12 @@ make eval-all
 python eval/check_gold_evidence_alignment.py
 python eval/run_retrieval_eval.py --questions eval/golden_questions.jsonl --k 5
 python eval/run_expanded_eval_summary.py
+python eval/run_google_embedding_failure_analysis.py
 ```
 
 ## 默认 pipeline 与诊断边界
 
-- **Rule reranker 默认关闭**（`RERANKER_PROVIDER=none`）；`rule` 仅用于 benchmark / ablation。
+- **Rule reranker 默认关闭**（`RERANKER_PROVIDER=none`）；`rule` 有 ablation 价值，但不是当前默认最优策略。
 - **Anchored retrieval 默认启用**（`ANCHORED_PAPER_RETRIEVAL=true`）。
 - **`forced_gold_source_anchor` 仅**在 `eval/run_query_anchor_ablation.py` 中用于诊断，不进入默认 pipeline。
 - **Corpus-level 问题**（如「这些文献 / 所有干细胞类型」）不应自动锚定到单篇论文。
@@ -33,14 +36,36 @@ python eval/run_expanded_eval_summary.py
 
 扩展实验文档：[Google Embedding Failure Analysis](google_embedding_failure_analysis.md)
 
+## 当前扩展 eval 结果（retrieval only）
+
+基于本地 Google embedding 索引与人工 gold evidence（`retrieval_eval_20260531_090008`）。**不代表生产环境性能**，也**不是** end-to-end 回答质量。
+
+| 指标 | 值 |
+| --- | --- |
+| recall@5 | 0.936 |
+| recall@10 | 0.936 |
+| recall@20 | 0.968 |
+| precision@5 | 0.761 |
+| MRR | 0.844 |
+| nDCG@5 | 0.996 |
+| doc_type_accuracy | 0.987 |
+| sop_boundary_accuracy | 0.968 |
+| paper_to_sop_confusion_rate | 0.013 |
+
+**最弱类型**：paper-only hard negatives（如 Özkale perspective、d2lc 被 Wang / 相近 microgel 论文挤占）。后续方向：paper title/entity query expansion、section-aware retrieval、paper-only failure analysis。
+
+汇总报告：[`eval/reports/expanded_eval_summary_20260531_091656.md`](../../eval/reports/expanded_eval_summary_20260531_091656.md)
+
 ## 输出文件
 
 报告写入 `eval/reports/`：
 
 - `retrieval_eval_<timestamp>.json/.md`
+- `gold_evidence_alignment_<timestamp>.json/.md`
+- `expanded_eval_summary_<timestamp>.json/.md`
 - `generation_eval_<timestamp>.json/.md`
 - `ragas_eval_<timestamp>.json/.md`
-- `rag_eval_summary_<timestamp>.md`
+- `google_embedding_failure_analysis.md`（failure analysis 汇总）
 
 ## 指标解释
 
@@ -54,8 +79,8 @@ python eval/run_expanded_eval_summary.py
 
 ## 当前限制
 
-仓库不包含真实客户语料，默认 gold 文件是模板示例。RAGAS 为可选依赖；没有 `ragas` 或 reference answer 时不会阻塞其他评估。
+仓库 gold 集基于本地小型真实语料与人工标注，用于 pipeline 调试与 failure 定位。RAGAS 为可选依赖；没有 `ragas` 或 reference answer 时不会阻塞其他评估。
 
 ## 如何改进系统
 
-先看失败案例列表：如果 route 错，优先改 `query_analyzer.py`；如果 doc_type 错，优先查 ingest metadata 和 reranker；如果 gold source 找不到，先确认本地 Chroma 是否已经用同一 embedding 配置重建。
+先看 failure cases 与 `run_google_embedding_failure_analysis.py`：route 错 → `query_analyzer.py`；gold 不在 pool → anchoring / candidate topN；gold 在 pool 但 rank 低 → 再考虑 cross-encoder rerank（默认仍不用 rule reranker 刷分）。

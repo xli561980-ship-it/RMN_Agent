@@ -114,20 +114,38 @@ Rule reranker 机制包括：
 ## 7. 当前结论
 
 1. **主要瓶颈不是 Google embedding 本身**——多数失败是 ranking、anchoring、HYBRID 候选池或 **gold label design**。
-2. 小型 5 题 eval 已被调通（recall@5=1.0），**不应继续围绕这 5 题过拟合**（调 rule weight、改 anchor 刷分）。
+2. 小型 5 题 eval 已被调通（recall@5=1.0），**不应继续围绕 5 题过拟合**（调 rule weight、改 anchor 刷分）。
 3. 默认配置保持：
-   - `RERANKER_PROVIDER=none`
+   - `RERANKER_PROVIDER=none`（rule reranker 仅 ablation）
    - `ANCHORED_PAPER_RETRIEVAL=true`
-   - rule reranker / forced gold anchor 仅用于 benchmark 与诊断。
-4. 评估体系应升级为：**可发现问题 → 解释 failure → 修正标签 → 扩展 hard cases**。
+   - `forced_gold_source_anchor` 仅 eval 诊断；corpus-level 问题不自动锚定单篇论文
+4. 评估体系已扩展为 **31 questions / 69 gold evidence**。
+
+### 扩展集 retrieval 结果（本地 eval，非生产性能）
+
+基于 `retrieval_eval_20260531_090008` / `expanded_eval_summary_20260531_091656`：
+
+| 指标 | 值 |
+| --- | --- |
+| recall@5 | **0.936** |
+| recall@10 | 0.936 |
+| recall@20 | 0.968 |
+| precision@5 | 0.761 |
+| MRR | 0.844 |
+| nDCG@5 | 0.996 |
+| doc_type_accuracy | 0.987 |
+| sop_boundary_accuracy | 0.968 |
+| paper_to_sop_confusion_rate | 0.013 |
+
+**最弱类型**：paper-only（recall@5≈0.6），典型 hard negatives 为 Özkale perspective、d2lc 被 Wang / 相近 microgel 论文挤占。后续：paper title/entity query expansion、section-aware retrieval、paper-only failure analysis；cross-encoder rerank 仅在 gold 已在 candidate pool 时评估。
 
 ## 8. 后续计划
 
-- [x] 扩展 golden questions 至 **30 题**（paper / SOP / hybrid / missing / anchor 等类型）；
+- [x] 扩展 golden questions 至 **31 题 / 69 gold evidence**；
 - [x] 增加 **gold evidence alignment check**（`make eval-gold-check`）；
 - [ ] 持续增加 **hard negatives**（相近 microgel 论文、MSDS vs BA 手册、cross-language SOP）；
 - [ ] 保留 recall@5/10/20、`gold_hit_rank`、failure analysis 作为固定报告项；
-- [ ] 在扩展集上观察 **真实 recall 下降** 并解释原因，而非回退到 5 题刷分。
+- [ ] **paper-only query expansion** 与 generation eval，而非回退到 5 题刷分或默认启用 rule reranker。
 
 相关命令：
 
