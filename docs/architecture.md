@@ -2,108 +2,145 @@
 
 RMN Agent 是一个本地 Streamlit + Python RAG 应用，用于科研文档和实验室 SOP / 手册的知识问答。它的核心架构选择是把“论文证据”和“可执行操作规范”分开处理：论文用于解释研究方法、实验参数和结果，SOP / 手册用于约束实际操作、安全要求和设备使用。
 
-当前系统是单轮 RAG 编排，不是长期自主规划型 Agent。它更关注一次用户提问中的问题分析、检索路由、证据组织、回答生成和引用检查。
+当前系统是**单轮 RAG 编排 + 离线评估闭环**，不是长期自主规划型 Agent。生产 Demo 路径关注一次提问中的问题分析、检索路由、候选构建、证据组织、回答生成和引用检查；评估路径则通过 golden questions / gold evidence 与 failure analysis 迭代改进 retrieval，**不进入默认在线主链路**。
 
-## 模块关系
+**Rule reranker 默认关闭**（`RERANKER_PROVIDER=none`），仅作为 benchmark / ablation 可配置项。
+
+---
+
+## 1. 离线入库流程
 
 ```mermaid
 flowchart TD
-    App[app.py Streamlit 界面] --> IngestButton[触发 ingest.py]
-    App --> Analyzer[query_analyzer.py 问题分析]
-    App --> Core[rag_core.py RAG 编排]
-    Analyzer --> Fallback[规则 fallback]
-    Analyzer --> AnalyzerLLM[Google Gemini 结构化输出]
-    Core --> Scope[fusion_scope.py 范围控制]
-    Core --> Prompts[fusion_prompts.py Prompt 规则]
-    Core --> Validator[citation_validator.py 引用检查]
-    Core --> Chroma[(Chroma 本地向量库)]
-    IngestButton --> Ingest[ingest.py 入库流水线]
-    Ingest --> Parsers[LlamaParse / pdfplumber / python-docx]
-    Ingest --> Embeddings[Embedding provider]
-    Embeddings --> Chroma
-    Prompts --> GenerationLLM[Google Gemini 回答生成]
-    GenerationLLM --> App
-    Validator --> App
+    DataPapers["data/papers/ 论文与补充材料"] --> IngestPy["ingest.py"]
+    DataManuals["data/manuals/ SOP 与设备手册"] --> IngestPy
+    IngestPy --> Parser["LlamaParse / pdfplumber / python-docx"]
+    Parser --> Chunking["chunking/<br/>fixed / header-aware / parent-child"]
+    Chunking --> Meta["metadata<br/>doc_type=paper|sop<br/>source / section / project_id"]
+    Meta --> Emb["Embedding<br/>Google / local_hash / optional HF"]
+    Emb --> Chroma["Chroma 向量库"]
+    IngestPy --> Manifest["corpus_manifest.json<br/>processed_files.json"]
+    Env[".env 入库配置"] -.-> IngestPy
 ```
 
-## 数据流
+**要点**
 
-1. 用户将本地非敏感文档放入 `data/papers/` 或 `data/manuals/`。
-2. `ingest.py` 只扫描这两个目录，并把支持的 `.pdf` 和 `.docx` 文件标记为论文或 SOP / 手册。
-3. 对论文文件，入库流程会写入 `doc_type=paper`，并通过文件名规则识别正文与补充材料；可用时也会做 LLM 辅助元数据抽取。
-4. 对 SOP / 手册文件，入库流程写入 `doc_type=sop` 和 `doc_role=manual`，不走论文题录抽取逻辑。
-5. 文档被解析为近似 Markdown 的文本，再经过 header splitting 和 recursive chunking。论文 chunk 默认更小，便于参数级检索；SOP chunk 默认更大，尽量保留完整步骤。
-6. embedding 写入本地 Chroma collection。`processed_files.json` 记录已处理文件，`corpus_manifest.json` 记录语料级信息。
-7. 查询阶段，`app.py` 将用户问题和可选 paper anchor 传给 `query_analyzer.py`。
-8. analyzer 返回 `intent`、`answer_mode`、实体、可选论文范围字段，以及 paper / SOP 两条检索 query。
-9. `rag_core.py` 根据 route 和 metadata filter 检索 paper chunk、SOP chunk，或二者同时检索。
-10. 检索到的 chunk 被格式化为带 `citation_hint` 的上下文块。
-11. `fusion_prompts.py` 根据回答模式组装系统 Prompt，要求模型基于检索证据回答。
-12. 模型将回答流式返回 Streamlit 界面。
-13. `citation_validator.py` 检查回答中的引用线索是否来自本轮检索 bundle，并标记缺少引用的数字型声明。
+- 论文与手册在**入库阶段**即分离：`data/papers/` → `doc_type=paper`，`data/manuals/` → `doc_type=sop`。
+- 论文 chunk 可带 `[DOC]` 前缀与 `project_id`；SOP chunk 保留更大窗口以覆盖完整步骤。
+- Chroma 只负责持久化向量与 metadata 过滤检索，不包含业务路由逻辑。
 
-## Agent 工作流
+---
+
+## 2. 在线问答流程
 
 ```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant UI as Streamlit 界面
-    participant QA as 问题分析
-    participant RAG as RAG 编排
-    participant DB as Chroma
-    participant LLM as Gemini
-    participant CV as 引用校验
-
-    U->>UI: 提出科研或实验室文档问题
-    UI->>QA: 分析问题与可选 paper anchor
-    QA-->>UI: 返回 intent、answer_mode、entities、检索 query
-    UI->>RAG: 调用 fusion_prepare(question, analysis)
-    RAG->>DB: 按 doc_type 和范围过滤检索
-    DB-->>RAG: 返回相关论文 / SOP 片段
-    RAG->>LLM: 发送上下文和 Prompt
-    LLM-->>UI: 流式回答
-    UI->>CV: 校验回答引用
-    CV-->>UI: 返回校验结果
+flowchart TD
+    User["用户问题"] --> UI["app.py Streamlit UI"]
+    UI --> QA["query_analyzer.py<br/>route + answer_mode"]
+    QA --> Anchor["paper_anchor.py<br/>strong / UI / corpus-level guard"]
+    QA --> Route{"PAPER_ONLY / SOP_ONLY / HYBRID"}
+    Route --> Paper["Paper path<br/>metadata filter + anchored retrieval"]
+    Route --> SOP["SOP path<br/>metadata filter"]
+    Anchor --> Paper
+    Chroma["Chroma"] --> Paper
+    Chroma --> SOP
+    Paper --> Merge["Candidate construction<br/>RRF / dedup / HYBRID balance"]
+    SOP --> Merge
+    Merge --> Bundle["rag_core.py evidence bundle"]
+    Bundle --> FP["fusion_prompts.py"]
+    FP --> LLM["Google Gemini"]
+    LLM --> CV["citation_validator.py"]
+    CV --> UI
+    Env[".env 运行时配置"] -.-> QA
+    Env -.-> Paper
+    Env -.-> SOP
+    Env -.-> LLM
 ```
+
+**要点**
+
+- `query_analyzer.py` 返回 `intent`、`answer_mode`、实体、双路 `search_queries` 与可选 `paper_scope_*`；LLM 不可用时规则 fallback。
+- `paper_anchor.py` 与 analyzer 集成：**corpus-level 问题不自动锚定单篇论文**；UI 选定论文时 deictic 指代跟随 UI anchor。
+- `rag_core.py`：向量或 hybrid lexical 召回 → anchored retrieval（RRF 合并）→ HYBRID 下 paper/SOP 候选池（topN ≥ 20）→ evidence bundle。
+- `fusion_scope.py` 提供范围过滤与标题软重排；**reranker 非默认必经步骤**。
+- `citation_validator.py` 为轻量字符串级检查，非完整事实验证。
+
+### 数据流（在线路径）
+
+1. 用户提问；可选 Streamlit 侧边栏锁定单篇论文。
+2. `analyze_query` + `enrich_analysis_with_paper_anchor` 确定 route 与 anchor。
+3. `fusion_prepare` 分路检索 Chroma，合并候选，组装带 `citation_hint` 的上下文。
+4. `compose_fusion_system_prompt` 按 `answer_mode` 生成系统 prompt。
+5. Gemini 流式回答；citation validator 与 debug 面板回显检索诊断（`retrieval_diagnostics`）。
+
+---
+
+## 3. RAG Evaluation 与 Debug Loop
+
+```mermaid
+flowchart TD
+    GQ["golden_questions.jsonl<br/>31 questions"] --> RE["run_retrieval_eval.py"]
+    GE["gold_evidence.jsonl<br/>69 rows"] --> RE
+    GE --> AL["check_gold_evidence_alignment.py"]
+    ChromaE["Chroma index"] --> RE
+    RE --> M["recall@k / MRR / nDCG / doc_type"]
+    RE --> FA["run_google_embedding_failure_analysis.py"]
+    AL --> FA
+    FA --> D{"根因分类"}
+    D --> A1["anchor / gold / candidate / chunking / embedding / rerank"]
+    A1 --> RE
+    RE --> RPT["eval/reports/"]
+    FA --> RPT
+    M --> RPT
+```
+
+**要点**
+
+- 评估是**旁路闭环**，不阻塞 Streamlit 问答。
+- `make eval-gold-check` → `make eval-retrieval` → `make eval-expanded` → failure analysis 报告。
+- Failure 标签：`ranking_issue`、`recall_issue`、`gold_label_mismatch`、query anchoring 等。
+- **Reranker benchmark**（`none` / `rule` / optional BGE）与 **embedding benchmark** 分离；默认 Makefile 不触发 HuggingFace 下载。
+- 当前扩展集 retrieval recall@5 ≈ 0.936（本地语料，非生产指标）；最弱：**paper-only hard negatives**。
+
+---
 
 ## 关键设计选择
 
-- 文档路径分离：`data/papers/` 和 `data/manuals/` 在入库阶段就对应不同 `doc_type`，避免后续只能靠文本内容猜来源。
-- 检索前先做问题分析：`query_analyzer.py` 将问题路由到 `PAPER_ONLY`、`SOP_ONLY` 或 `HYBRID`，不是每次都检索所有文档。
-- 回答模式与检索路由分开：`intent` 控制检索来源，`answer_mode` 控制回答形态；论文总结和操作规范问题不使用同一种输出规则。
-- 论文范围控制：UI 可以锁定单篇论文，analyzer 也可以从问题中提取 source、project_id 或标题提示。
-- 标题软重排：`fusion_scope.py` 不把 `paper_scope_paper_title` 直接作为 Chroma 精确过滤条件，而是在 Python 侧做模糊重排，减少空召回。
-- 混合检索选项：`rag_core.py` 支持向量检索，也支持向量 + 本地词法评分的混合召回。
-- 引用可见性：上下文块暴露 `citation_hint`，回答和 UI 都围绕这些线索展示来源。
-- 保守兜底：当 LLM query analyzer 不可用时，规则 fallback 仍能提供基础路由和范围判断。
+- **文档路径分离**：入库即写入 `doc_type`，检索按 metadata 过滤，减少 paper/SOP 混淆。
+- **Query analysis 先于检索**：`intent` 控制来源，`answer_mode` 控制回答形态。
+- **Paper anchor 与 corpus guard**：强信号 / UI anchor 启用 anchored retrieval；泛化问句不强制单篇 scope。
+- **HYBRID 候选构建**：paper 与 SOP 分别召回后再 RRF / quota 合并，而非简单交错拼接。
+- **Anchored retrieval**：对 `paper_scope_source` 追加检索并与主路 RRF 合并，解决「参考论文里的 microgel」类 deictic 过泛问题。
+- **Rule reranker 默认关闭**：ablation 显示 recall@10 升、recall@5 不变、MRR 略降；优先 anchor 与候选池而非调权重刷分。
+- **Gold evidence 与问题语义一致**：corpus-level 问题扩展多篇 gold，避免假失败。
+- **引用可见性**：`citation_hint` 贯穿 context、回答与 validator。
 
 ## 配置面
 
-应用通过 `python-dotenv` 读取环境变量，主要配置包括：
+应用通过 `python-dotenv` 从项目根 `.env` 读取配置，主要分组：
 
-- 模型 key 与模型名：`GOOGLE_API_KEY`、`GEMINI_API_KEY`、`GOOGLE_LLM_MODEL`、`GOOGLE_QUERY_ANALYZER_MODEL`。
-- Embedding provider：`EMBEDDING_PROVIDER`、`GOOGLE_EMBEDDING_MODEL`、`OPENAI_EMBEDDING_MODEL`、`ZHIPU_EMBEDDING_MODEL`、`HF_EMBEDDING_MODEL`。
-- 解析配置：`LLAMA_CLOUD_API_KEY`、`INGEST_PDFPLUMBER_FALLBACK`。
-- Chroma 配置：`CHROMA_PERSIST_DIR`、`CHROMA_COLLECTION_NAME`。
-- 检索调参：`RAG_RETRIEVAL_MODE`、`HYBRID_LEXICAL_WEIGHT`、`HYBRID_LEXICAL_POOL_LIMIT`、`STRICT_PROTOCOL_APPENDIX`、`PAPER_PROTOCOL_K_MIN`、`PAPER_PROTOCOL_K_MAX`。
-- 入库调参：`SOP_CHUNK_SIZE`、`SOP_CHUNK_OVERLAP`、`INGEST_METADATA_EXCERPT_CHARS`、`DOCX_SEGMENT_CHARS`。
+| 分组 | 代表变量 |
+| --- | --- |
+| 模型 | `GOOGLE_API_KEY`, `GOOGLE_LLM_MODEL`, `GOOGLE_EMBEDDING_MODEL` |
+| 入库 | `LLAMA_CLOUD_API_KEY`, `INGEST_PDFPLUMBER_FALLBACK`, `EMBEDDING_PROVIDER` |
+| Chroma | `CHROMA_PERSIST_DIR`, `CHROMA_COLLECTION_NAME` |
+| 检索 | `RAG_RETRIEVAL_MODE`, `HYBRID_PAPER_CANDIDATE_TOPN`, `ANCHORED_PAPER_RETRIEVAL` |
+| Anchor | `ANCHORED_SOURCE_SOFT_MATCH`, `ANCHORED_PAPER_MIN_CHUNKS` |
+| Rerank（实验） | `RERANKER_PROVIDER=none`, `RERANK_RULE_WEIGHT` |
 
 ## 当前限制
 
-- 当前 UI 是本地 Streamlit 应用，不是完整 Web 产品。
-- 当前没有认证、授权、审计、监控或文档级权限模型。
-- 当前没有 REST API 或独立后端服务层。
-- 当前仓库没有 Dockerfile 或部署配置。
-- 当前仓库只包含 `data/` 占位目录，不包含真实 Demo 语料。
-- 引用校验是轻量规则检查，不能证明完整语义忠实。
-- 评估目前以单元测试和 JSONL 检索烟测为主，还不是完整评估体系。
+- 本地 Streamlit Demo，无认证、审计、REST API。
+- 仓库 `data/` 为占位；完整演示需自备语料并完成 `make ingest`。
+- Citation validation 为轻量规则，非 sentence-level 证据对齐。
+- Chroma 索引覆盖可能少于 `corpus_manifest` 全量文件，eval 结果依赖本地入库状态。
+- Retrieval eval 指标不代表生成质量或生产 SLA。
 
 ## 可扩展点
 
-- UI 层：增加文件上传、演示预设、结果导出和更清晰的用户引导。
-- API 层：将 `fusion_prepare` 与生成流程封装为服务接口，便于接入其他前端或演示系统。
-- 数据连接器：支持 SharePoint、Google Drive、Notion、ELN 或内部知识库等来源。
-- 治理能力：增加基于角色的文档访问、审计日志、脱敏和 SOP 审批状态。
-- 可观测性：记录 query route、retrieved sources、延迟、错误和 citation validation 结果。
-- 评估能力：扩展 `eval/golden_questions.jsonl`，报告 route accuracy、source coverage、citation quality 和失败案例。
-- 部署能力：增加 Docker 打包和环境化配置，让本地 Demo 更容易复现。
+- **RAG 评估**：paper-only query expansion、section-aware retrieval、generation eval、sentence-level alignment。
+- **产品化**：Web UI / API、权限、审计、Docker 部署。
+- **数据连接器**：SharePoint、ELN、更多文档类型。
+- **可选 rerank**：cross-encoder / BGE，仅在 gold 已在 candidate pool 时评估。
+
+更多实验说明见 [`docs/experiments/rag_evaluation.md`](experiments/rag_evaluation.md) 与 [`docs/experiments/google_embedding_failure_analysis.md`](experiments/google_embedding_failure_analysis.md)。

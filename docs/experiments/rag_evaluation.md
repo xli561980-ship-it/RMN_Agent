@@ -4,6 +4,8 @@
 
 RMN Agent 的核心风险不是“答不上来”，而是论文证据、SOP 约束和引用线索混淆。评估框架把 retrieval、generation 与可选 RAGAS 拆开，便于比较不同检索、切分、embedding 和 reranker 配置。
 
+**评估是离线旁路闭环，不是 Streamlit 问答主链路。** 生产默认路径见 README「图 1」；下图逻辑见 README「图 2」与 [`docs/architecture.md`](../architecture.md) 第 3 节。
+
 当前扩展 golden set：**31 questions / 69 gold evidence**（paper-only、paper comparison、SOP-only、hybrid、missing evidence、ambiguous anchor）。
 
 ## 如何运行
