@@ -24,7 +24,12 @@ LANGUAGE_MATCH = """
 
 CITATION_DISCIPLINE = """
 【Citations & facts — mandatory】
+- Treat citation formatting as a strict machine-checkable contract. Every citation bracket you write must be copied from a `citation_hint:` line in the retrieved context.
 - For every factual claim, number, condition, conclusion, or procedural step, include the matching `citation_hint` **verbatim** or a **character-identical** quote so it can be checked against the context and the reference list. Do not shorten or reword hints in ways that break traceability.
+- Never merge citations. If two chunks support one sentence, write two separate copied hints, e.g. `[Source: `source_a.pdf` p.2] [Source: `source_a.pdf` p.5]`; never write `[Source: `source_a.pdf` p.2, p.5]`.
+- Never create bare page citations such as `[Source: p.3]`, `[Source: p.9, 18]`, or `[Source: supplementary p.2]`. A valid citation must include the exact source/title text shown inside the retrieved `citation_hint`.
+- Never combine two source files inside one citation bracket. Use separate copied brackets, one per retrieved chunk/source.
+- For tables, put a valid copied citation in the same cell as every numeric value or parameter claim. Do not rely on a citation in the row header or surrounding paragraph.
 - Do not invent figures, p-values, sample sizes, or statistics not present in the context.
 - If a statement has no support in the context, say explicitly that the context does not provide evidence — do not assert it.
 """
@@ -65,6 +70,7 @@ PROTOCOL_RIGOR_APPEND = """
 【Paper protocols — “brief first, then complete” — mandatory when this block is present】
 - You may start with a **short overview** (≤5 bullets or one short paragraph) of what the retrieved papers collectively address. Do **not** stop there for procedure-style questions.
 - **Verbatim `citation_hint` discipline** from above still applies everywhere, including inside numbered steps: after each step or coherent step group, attach the matching `citation_hint` **verbatim** so every material, parameter, and action is traceable.
+- Do not compress repeated step citations into page ranges. Copy each relevant retrieved hint as a separate bracket.
 
 ### Complete protocol (verbatim-detail level, evidence-bound) | 完整严格流程（仅依据检索片段，禁止脑补）
 This section is **mandatory** and must appear **at the end of the answer body** (after any overview). It is **not** a high-level summary: it is a **step-by-step reconstruction strictly from Reference 1 chunks**, preserving the **original sub-step order** as far as the text allows.
@@ -82,7 +88,7 @@ This section is **mandatory** and must appear **at the end of the answer body** 
 - After both (or all) complete protocol sections, add:
 
 ### Cross-paper differences (context-supported only) | 文献间差异（仅限上下文支持）
-- Tabulate or bullet **only** contrasts that are **explicitly supported** by the retrieved chunks (parameters, materials, process branches, characterization, post-processing, etc.). Each contrast must carry the relevant `citation_hint`(s) for both sides.
+- Tabulate or bullet **only** contrasts that are **explicitly supported** by the retrieved chunks (parameters, materials, process branches, characterization, post-processing, etc.). Each contrast must carry separate copied `citation_hint` brackets for both sides; do not merge them.
 - If the chunks do **not** support a comparison on an aspect, write explicitly, e.g.: **「当前检索片段不足以对比以下方面：…」** listing those aspects — **no speculative differences**.
 
 **SCHOLARLY mode note:** Even when the global answer shape is scholarly, **this appendix still applies** whenever this block is present: keep the scholarly part concise if needed, but **never** replace this final section with a summary-only protocol.

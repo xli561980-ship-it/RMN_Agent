@@ -140,6 +140,8 @@ class TestComposePrompt(unittest.TestCase):
         )
         self.assertIn("SCHOLARLY", text)
         self.assertIn("citation_hint", text)
+        self.assertIn("Never merge citations", text)
+        self.assertIn("Never create bare page citations", text)
         self.assertIn("ctx p", text)
         self.assertNotIn("Complete protocol", text)
 

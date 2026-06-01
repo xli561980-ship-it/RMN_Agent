@@ -690,7 +690,7 @@ def _escape_prompt_template_braces(text: str) -> str:
     return (text or "").replace("{", "{{").replace("}", "}}")
 
 
-def _build_fusion_llm(*, temperature: float = 0.2) -> ChatGoogleGenerativeAI:
+def _build_fusion_llm(*, temperature: float = 0.0) -> ChatGoogleGenerativeAI:
     api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("Set GOOGLE_API_KEY or GEMINI_API_KEY to use ChatGoogleGenerativeAI.")
@@ -701,7 +701,7 @@ def _build_fusion_llm(*, temperature: float = 0.2) -> ChatGoogleGenerativeAI:
     )
 
 
-def build_fusion_rag_chain(*, temperature: float = 0.2, system_prompt: Optional[str] = None):
+def build_fusion_rag_chain(*, temperature: float = 0.0, system_prompt: Optional[str] = None):
     """
     Build the Fusion LCEL chain: `system_prompt` is the fully expanded system string per request
     (normally from `fusion_prepare`). If omitted, a minimal placeholder system is used for legacy callers.
@@ -729,11 +729,11 @@ def invoke_fusion_rag(
 ) -> str:
     """非流式：内部完成解析与检索后一次性生成。"""
     bundle = fusion_prepare(question, k=k, paper_source_scope=paper_source_scope)
-    chain = build_fusion_rag_chain(temperature=0.2, system_prompt=bundle["fusion_system_prompt"])
+    chain = build_fusion_rag_chain(temperature=0.0, system_prompt=bundle["fusion_system_prompt"])
     return chain.invoke({"question": bundle["user_question"]})
 
 
-def stream_fusion_rag_from_bundle(bundle: Dict[str, Any], *, temperature: float = 0.2):
+def stream_fusion_rag_from_bundle(bundle: Dict[str, Any], *, temperature: float = 0.0):
     """流式生成：调用方需先 `fusion_prepare` 拿到 bundle，以便 UI 先展示解析/检索状态。"""
     sp = bundle.get("fusion_system_prompt")
     if not (sp or "").strip():

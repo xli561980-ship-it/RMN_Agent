@@ -41,6 +41,8 @@ pip install -r requirements.txt
 pip install pytest
 ```
 
+默认文档解析是本地路线：PDF 使用 `pdfplumber`，Word 使用 `python-docx`。不需要 LlamaParse，也不会消耗 LlamaParse credits。
+
 3. 入库：
 
 ```bash
@@ -65,6 +67,56 @@ make app
 make test
 make smoke
 ```
+
+## 调试与实验比较
+
+本项目建议把每次调参当作一次可复现实验，而不是只看 Streamlit 当前回答。
+
+1. 跑 baseline 并保存完整检索记录：
+
+```bash
+.venv/bin/python eval/run_experiment.py \
+  --questions eval/golden_questions.jsonl \
+  --config eval/configs/baseline.json
+```
+
+结果会写入 `eval/runs/<run_id>.jsonl`。每个 case 会记录 config、query analysis、检索到的 paper/SOP chunks、source、latency 和基础 metrics。
+这些 JSONL 是本地调试产物，可能包含检索片段和生成答案，默认不提交到 GitHub。
+
+2. 对比两次或多次运行：
+
+```bash
+.venv/bin/python eval/compare_runs.py \
+  eval/runs/<baseline>.jsonl \
+  eval/runs/<candidate>.jsonl \
+  --out compare_baseline_candidate.md
+```
+
+报告会列出 route accuracy、required source hit、citation ok（若生成答案）、latency、自动 score，以及逐 case 的 improvements/regressions。自动 score 只用于筛选候选，不替代人工审查实验安全类答案。
+
+3. 审计知识库覆盖：
+
+```bash
+.venv/bin/python eval/audit_corpus.py --out eval/reports/corpus_audit.json
+```
+
+该脚本对齐磁盘文档、`processed_files.json` 和 Chroma `source`，用于发现“磁盘有但未入库”“processed 记录存在但 Chroma 无 chunk”等问题。当前 ingest 会递归扫描 `data/papers/` 与 `data/manuals/`。
+
+4. 审计本地解析质量（不写 Chroma）：
+
+```bash
+.venv/bin/python eval/parse_audit.py --parser fallback --limit 5 \
+  --out eval/runs/parse_audit_local_sample.jsonl
+```
+
+5. 可选：比较 LlamaParse 与本地 fallback（默认不推荐，可能消耗付费 credits）：
+
+```bash
+.venv/bin/python eval/parse_audit.py --parser both --limit 5 \
+  --out eval/runs/parse_audit_sample.jsonl
+```
+
+只有在安装 `llama-parse`、设置 `INGEST_USE_LLAMAPARSE=true` 并配置 `LLAMA_CLOUD_API_KEY` 时，入库才会尝试 LlamaParse。否则主线始终使用本地解析。
 
 ## 目录说明
 

@@ -37,7 +37,17 @@ ANCHOR_NONE_LABEL = "(None — all papers in library)"
 def _list_ingest_document_names(folder: Path) -> list[str]:
     if not folder.is_dir():
         return []
-    return sorted(p.name for p in folder.iterdir() if is_supported_ingest_file(p))
+    out = []
+    for p in folder.rglob("*"):
+        try:
+            rel = p.relative_to(folder).as_posix()
+        except ValueError:
+            rel = p.name
+        if rel.startswith(".") or "/." in rel:
+            continue
+        if is_supported_ingest_file(p):
+            out.append(rel)
+    return sorted(out)
 
 
 def _run_ingest(*, rebuild: bool) -> tuple[int, str]:

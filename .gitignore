@@ -24,3 +24,8 @@ data/manuals/*
 data/private/
 outputs/
 reports/
+eval/runs/
+
+# Keep curated evaluation reports visible even though generic reports are ignored.
+!eval/reports/
+!eval/reports/**

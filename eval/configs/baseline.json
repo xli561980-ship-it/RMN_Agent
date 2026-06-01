@@ -1,0 +1,16 @@
+{
+  "name": "baseline",
+  "description": "Current default hybrid retrieval with protocol-rigor enabled.",
+  "k": 5,
+  "strict_protocol_appendix": true,
+  "env": {
+    "RAG_RETRIEVAL_MODE": "hybrid",
+    "HYBRID_LEXICAL_POOL_LIMIT": "20000",
+    "HYBRID_LEXICAL_WEIGHT": "0.35",
+    "STRICT_PROTOCOL_APPENDIX": "true",
+    "PAPER_PROTOCOL_K_MIN": "12",
+    "PAPER_PROTOCOL_K_MAX": "20",
+    "PAPER_MULTI_SOURCE_SUPPLEMENT_K": "5",
+    "PAPER_MULTI_SOURCE_MAX_ADD": "12"
+  }
+}
