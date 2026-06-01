@@ -1,0 +1,59 @@
+{
+  "rows": [
+    {
+      "reranker": "none",
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "sop_boundary_accuracy": 0.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 0.0,
+      "failure_cases": [
+        "sop_litesizer_basic",
+        "paper_protocol_microgel",
+        "hybrid_replicate_safety",
+        "paper_compare",
+        "missing_evidence"
+      ]
+    },
+    {
+      "reranker": "rule",
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "sop_boundary_accuracy": 0.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 0.0,
+      "failure_cases": [
+        "sop_litesizer_basic",
+        "paper_protocol_microgel",
+        "hybrid_replicate_safety",
+        "paper_compare",
+        "missing_evidence"
+      ]
+    },
+    {
+      "reranker": "bge",
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0,
+      "sop_boundary_accuracy": 0.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 0.0,
+      "failure_cases": [
+        "sop_litesizer_basic",
+        "paper_protocol_microgel",
+        "hybrid_replicate_safety",
+        "paper_compare",
+        "missing_evidence"
+      ]
+    }
+  ],
+  "k": 5
+}

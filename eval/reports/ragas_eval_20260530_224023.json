@@ -1,0 +1,6 @@
+{
+  "skipped": true,
+  "reason": "ragas is not installed. Install optional dependencies to run this evaluation.",
+  "metrics": {},
+  "cases": []
+}

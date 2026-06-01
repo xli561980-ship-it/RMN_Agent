@@ -1,0 +1,44 @@
+{
+  "rows": [
+    {
+      "reranker": "none",
+      "recall@5": 0.88,
+      "precision@5": 0.88,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "sop_boundary_accuracy": 0.8,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 129.706,
+      "failure_cases": []
+    },
+    {
+      "reranker": "rule",
+      "recall@5": 0.8,
+      "precision@5": 0.8,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "sop_boundary_accuracy": 1.0,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 50.366,
+      "failure_cases": []
+    },
+    {
+      "reranker": "bge",
+      "recall@5": 0.88,
+      "precision@5": 0.88,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "sop_boundary_accuracy": 0.8,
+      "paper_to_sop_confusion_rate": 0.0,
+      "avg_rerank_latency_ms": 0,
+      "avg_total_retrieval_latency_ms": 138.566,
+      "failure_cases": []
+    }
+  ],
+  "k": 5,
+  "preflight_warnings": [
+    "未发现 corpus_manifest.json；看起来还没有完成可复现入库。"
+  ]
+}

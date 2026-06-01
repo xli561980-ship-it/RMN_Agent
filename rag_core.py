@@ -15,6 +15,7 @@ import os
 import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from dotenv import load_dotenv
@@ -32,9 +33,17 @@ from fusion_scope import (
     rerank_paper_docs_by_title_hint,
 )
 from ingest import CHROMA_COLLECTION_NAME, CHROMA_PERSIST_DIR, build_embeddings
+from paper_anchor import (
+    anchored_source_from_analysis,
+    anchored_title_hint_from_analysis,
+    resolve_best_source,
+    resolve_sources_by_title_hint,
+)
 from query_analyzer import analyze_query, normalize_analysis
+from rerankers import rerank_documents, rerank_dual_path
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
 
 logger = logging.getLogger(__name__)
 
@@ -314,6 +323,133 @@ def _lexical_search_filtered(
     return [d for _, _, d in scored[: max(k, 1)]]
 
 
+def _anchored_paper_retrieval_enabled() -> bool:
+    return (os.getenv("ANCHORED_PAPER_RETRIEVAL", "true") or "").lower() not in ("0", "false", "no")
+
+
+def _anchored_paper_min_chunks() -> int:
+    return max(1, int(os.getenv("ANCHORED_PAPER_MIN_CHUNKS", "3")))
+
+
+def _anchored_paper_title_boost() -> float:
+    try:
+        return float(os.getenv("ANCHORED_PAPER_TITLE_BOOST", "0.25"))
+    except ValueError:
+        return 0.25
+
+
+def _anchored_source_soft_match() -> bool:
+    return (os.getenv("ANCHORED_SOURCE_SOFT_MATCH", "true") or "").lower() not in ("0", "false", "no")
+
+
+def _hybrid_path_candidate_topn(k: int) -> int:
+    return max(int(k), 20, int(os.getenv("HYBRID_PAPER_CANDIDATE_TOPN", "20")))
+
+
+def _rrf_merge_multiple(
+    ranked_lists: Sequence[Sequence[Document]],
+    k: int,
+    *,
+    list_boosts: Sequence[float] | None = None,
+) -> List[Document]:
+    if not ranked_lists:
+        return []
+    boosts = list(list_boosts or [1.0] * len(ranked_lists))
+    scores: Dict[Tuple, float] = {}
+    docs_by_fp: Dict[Tuple, Document] = {}
+    for list_idx, docs in enumerate(ranked_lists):
+        weight = boosts[list_idx] if list_idx < len(boosts) else 1.0
+        for rank, doc in enumerate(docs):
+            fp = _doc_fingerprint(doc)
+            docs_by_fp.setdefault(fp, doc)
+            scores[fp] = scores.get(fp, 0.0) + weight / (rank + 1)
+    ordered = sorted(scores.items(), key=lambda item: (-item[1], str(item[0])))
+    return [docs_by_fp[fp] for fp, _ in ordered[: max(k, 1)]]
+
+
+def _dedupe_docs(docs: Sequence[Document]) -> List[Document]:
+    out: List[Document] = []
+    seen: Set[Tuple] = set()
+    for doc in docs:
+        fp = _doc_fingerprint(doc)
+        if fp in seen:
+            continue
+        seen.add(fp)
+        out.append(doc)
+    return out
+
+
+def _resolve_anchor_source(analysis: Dict[str, Any], title_soft_hint: Optional[str]) -> str:
+    source = anchored_source_from_analysis(analysis)
+    if source:
+        return source
+    if not _anchored_source_soft_match():
+        return ""
+    hint = anchored_title_hint_from_analysis(analysis) or (title_soft_hint or "").strip()
+    if not hint:
+        return ""
+    return resolve_best_source(hint) or ""
+
+
+def _retrieve_paper_with_anchor(
+    vectorstore: Chroma,
+    query: str,
+    analysis: Dict[str, Any],
+    pool_k: int,
+    *,
+    paper_extra_filter: Optional[Dict[str, Any]] = None,
+    title_soft_hint: Optional[str] = None,
+) -> Tuple[List[Document], Dict[str, Any]]:
+    anchor_source = _resolve_anchor_source(analysis, title_soft_hint)
+    min_chunks = _anchored_paper_min_chunks()
+    boost = _anchored_paper_title_boost()
+    locked = bool(paper_extra_filter and str(paper_extra_filter.get("source") or "").strip())
+
+    anchored_docs: List[Document] = []
+    if _anchored_paper_retrieval_enabled() and anchor_source and not locked:
+        anchored_docs = _similarity_search_filtered(
+            vectorstore,
+            query,
+            max(pool_k, min_chunks),
+            "paper",
+            {"source": anchor_source},
+        )
+    elif _anchored_paper_retrieval_enabled() and not locked:
+        hint = anchored_title_hint_from_analysis(analysis) or (title_soft_hint or "").strip()
+        if hint:
+            for src in resolve_sources_by_title_hint(hint)[:3]:
+                anchored_docs.extend(
+                    _similarity_search_filtered(vectorstore, query, min_chunks, "paper", {"source": src})
+                )
+            anchored_docs = _dedupe_docs(anchored_docs)
+
+    semantic_docs = _similarity_search_filtered(vectorstore, query, pool_k, "paper", paper_extra_filter)
+
+    if anchored_docs and not locked:
+        merged = _rrf_merge_multiple(
+            [anchored_docs, semantic_docs],
+            pool_k,
+            list_boosts=[1.0 + boost, 1.0],
+        )
+        anchor_fps = {_doc_fingerprint(d) for d in anchored_docs}
+        front = [d for d in merged if _doc_fingerprint(d) in anchor_fps][:min_chunks]
+        rest = [d for d in merged if _doc_fingerprint(d) not in {_doc_fingerprint(x) for x in front}]
+        merged = _dedupe_docs(front + rest)[:pool_k]
+    else:
+        merged = semantic_docs[:pool_k]
+
+    hit_count = 0
+    if anchor_source:
+        hit_count = sum(1 for d in merged if str((d.metadata or {}).get("source") or "") == anchor_source)
+    diag = {
+        "anchored_source_detected": anchor_source or None,
+        "anchored_source_hit_count": hit_count,
+        "paper_candidate_pool_size": len(merged),
+        "anchored_candidate_count": len(anchored_docs),
+    }
+    return merged, diag
+
+
 def _merge_ranked_docs(vector_docs: List[Document], lexical_docs: List[Document], k: int) -> List[Document]:
     if not lexical_docs:
         return vector_docs[:k]
@@ -465,7 +601,7 @@ def retrieve_dual_path_filtered(
     paper_title_soft_hint: Optional[str] = None,
     paper_k: Optional[int] = None,
     sop_k: Optional[int] = None,
-) -> Tuple[List[Document], List[Document], str]:
+) -> Tuple[List[Document], List[Document], str, Dict[str, Any]]:
     """
     根据解析出的 intent，向 Chroma 发起带 doc_type 的检索。
 
@@ -475,7 +611,7 @@ def retrieve_dual_path_filtered(
     - `paper_k` / `sop_k`：可选覆盖各路 k（用于锁定单篇或 SCHOLARLY 提高论文路召回）。
     - HYBRID：paper / sop 两路并行；PAPER_ONLY / SOP_ONLY：单路。
 
-    返回 (paper_docs, sop_docs, paper_path_note)：note 为检索侧对用户说明的补充（可为空串）。
+    返回 (paper_docs, sop_docs, paper_path_note, retrieval_diagnostics)。
     """
     vs = vectorstore or get_vectorstore()
     sq = analysis.get("search_queries") or {}
@@ -484,37 +620,73 @@ def retrieve_dual_path_filtered(
     intent = analysis.get("intent") or "HYBRID"
     pk = int(paper_k) if paper_k is not None else int(k)
     sk = int(sop_k) if sop_k is not None else int(k)
-    pool_k = paper_retrieval_pool_k(pk, paper_title_soft_hint)
+    if intent == "HYBRID":
+        sk = max(sk, _hybrid_path_candidate_topn(k))
+        pool_k = max(paper_retrieval_pool_k(pk, paper_title_soft_hint), _hybrid_path_candidate_topn(k))
+    else:
+        pool_k = paper_retrieval_pool_k(pk, paper_title_soft_hint)
 
     paper_docs: List[Document] = []
     sop_docs: List[Document] = []
     paper_note = ""
+    retrieval_diag: Dict[str, Any] = {
+        "anchored_source_detected": None,
+        "anchored_source_hit_count": 0,
+        "paper_candidate_pool_size": 0,
+        "sop_candidate_pool_size": 0,
+    }
 
     if intent == "HYBRID":
-        with ThreadPoolExecutor(max_workers=2) as ex:
-            fp = ex.submit(_similarity_search_filtered, vs, paper_q, pool_k, "paper", paper_extra_filter)
-            fs = ex.submit(_similarity_search_filtered, vs, sop_q, sk, "sop", None)
-            paper_docs = fp.result()
-            sop_docs = fs.result()
+        paper_docs, paper_diag = _retrieve_paper_with_anchor(
+            vs,
+            paper_q,
+            analysis,
+            pool_k,
+            paper_extra_filter=paper_extra_filter,
+            title_soft_hint=paper_title_soft_hint,
+        )
+        sop_docs = _similarity_search_filtered(vs, sop_q, sk, "sop", None)
+        retrieval_diag.update(paper_diag)
+        retrieval_diag["sop_candidate_pool_size"] = len(sop_docs)
     elif intent == "PAPER_ONLY":
-        paper_docs = _similarity_search_filtered(vs, paper_q, pool_k, "paper", paper_extra_filter)
+        paper_docs, paper_diag = _retrieve_paper_with_anchor(
+            vs,
+            paper_q,
+            analysis,
+            pool_k,
+            paper_extra_filter=paper_extra_filter,
+            title_soft_hint=paper_title_soft_hint,
+        )
+        retrieval_diag.update(paper_diag)
     elif intent == "SOP_ONLY":
         sop_docs = _similarity_search_filtered(vs, sop_q, sk, "sop", None)
+        retrieval_diag["sop_candidate_pool_size"] = len(sop_docs)
     else:
-        paper_docs = _similarity_search_filtered(vs, paper_q, pool_k, "paper", paper_extra_filter)
+        paper_docs, paper_diag = _retrieve_paper_with_anchor(
+            vs,
+            paper_q,
+            analysis,
+            pool_k,
+            paper_extra_filter=paper_extra_filter,
+            title_soft_hint=paper_title_soft_hint,
+        )
         sop_docs = _similarity_search_filtered(vs, sop_q, sk, "sop", None)
+        retrieval_diag.update(paper_diag)
+        retrieval_diag["sop_candidate_pool_size"] = len(sop_docs)
 
     if intent != "SOP_ONLY":
         paper_docs, rnote = rerank_paper_docs_by_title_hint(
             paper_docs,
-            paper_title_soft_hint or "",
+            paper_title_soft_hint or anchored_title_hint_from_analysis(analysis) or "",
             paper_q,
             pk,
         )
         paper_note = rnote or ""
+        retrieval_diag["paper_candidate_pool_size"] = len(paper_docs)
 
     paper_docs = _apply_si_boost(vs, paper_docs, paper_q)
-    return paper_docs, sop_docs, paper_note
+    retrieval_diag["candidate_pool_size"] = len(paper_docs) + len(sop_docs)
+    return paper_docs, sop_docs, paper_note, retrieval_diag
 
 
 def format_paper_context_blocks(docs: Sequence[Document]) -> str:
@@ -589,6 +761,17 @@ Do not hallucinate. If parameters are missing, say so. If safety SOP is missing 
 """
 
 
+def _flatten_bundle_docs(paper_docs: Sequence[Document], sop_docs: Sequence[Document], k: int) -> List[Document]:
+    docs: List[Document] = []
+    max_len = max(len(paper_docs), len(sop_docs))
+    for i in range(max_len):
+        if i < len(paper_docs):
+            docs.append(paper_docs[i])
+        if i < len(sop_docs):
+            docs.append(sop_docs[i])
+    return docs[: max(k, 1)]
+
+
 def fusion_prepare(
     question: str,
     k: int = DEFAULT_RETRIEVER_K,
@@ -641,7 +824,7 @@ def fusion_prepare(
         note = f"{note} Protocol-rigor appendix active; paper-path k={paper_k} (caps PAPER_PROTOCOL_K_MIN/MAX)."
 
     vs = vectorstore or get_vectorstore()
-    paper_docs, sop_docs, path_note = retrieve_dual_path_filtered(
+    paper_docs, sop_docs, path_note, retrieval_diag = retrieve_dual_path_filtered(
         q,
         analysis,
         k=k,
@@ -659,6 +842,51 @@ def fusion_prepare(
     if protocol_active and paper_docs:
         paper_docs = _supplement_multi_source_paper_chunks(vs, paper_docs, paper_q, paper_extra)
         paper_docs = _apply_si_boost(vs, paper_docs, paper_q)
+
+    docs_before_rerank = _flatten_bundle_docs(paper_docs, sop_docs, max(k, 20))
+    retrieval_diag["candidate_pool_size"] = len(docs_before_rerank)
+
+    rerank_info: Dict[str, Any] = {"provider": os.getenv("RERANKER_PROVIDER", "none"), "warning": "", "latency_ms": 0.0}
+    rerank_provider = (os.getenv("RERANKER_PROVIDER", "none") or "").strip().lower()
+    if rerank_provider not in ("", "none"):
+        try:
+            intent = str(analysis.get("intent") or "HYBRID")
+            if rerank_provider == "rule" and intent in {"HYBRID", "PAPER_ONLY", "SOP_ONLY"}:
+                paper_docs, sop_docs, reranked = rerank_dual_path(
+                    paper_docs,
+                    sop_docs,
+                    q,
+                    analysis,
+                    paper_limit=len(paper_docs),
+                    sop_limit=len(sop_docs),
+                )
+            else:
+                final_k = max(1, int(os.getenv("FINAL_CONTEXT_K", str(k))))
+                reranked = rerank_documents(
+                    list(paper_docs) + list(sop_docs),
+                    q,
+                    analysis,
+                    final_k=final_k,
+                )
+                paper_docs = [d for d in reranked.docs if (d.metadata or {}).get("doc_type") == "paper"]
+                sop_docs = [d for d in reranked.docs if (d.metadata or {}).get("doc_type") == "sop"]
+            rerank_info = {
+                "provider": reranked.provider,
+                "warning": reranked.warning,
+                "latency_ms": round(reranked.latency_ms, 2),
+                "metadata": reranked.metadata,
+            }
+            if reranked.warning:
+                logger.warning("Reranker warning: %s", reranked.warning)
+        except Exception as exc:
+            rerank_info = {"provider": os.getenv("RERANKER_PROVIDER", "none"), "warning": str(exc), "latency_ms": 0.0}
+            logger.warning("Reranker failed; falling back to original retrieval order: %s", exc)
+
+    docs_after_rerank = _flatten_bundle_docs(paper_docs, sop_docs, max(k, 20))
+    retrieval_diag["candidate_pool_size_after_rerank"] = len(docs_after_rerank)
+    retrieval_diag["paper_docs_pre_rerank_count"] = len(docs_before_rerank)
+    retrieval_diag["docs_before_rerank"] = docs_before_rerank
+    retrieval_diag["docs_after_rerank"] = docs_after_rerank
 
     paper_ctx = format_paper_context_blocks(paper_docs)
     sop_ctx = format_sop_context_blocks(sop_docs)
@@ -682,6 +910,8 @@ def fusion_prepare(
         "paper_retrieval_note": note,
         "paper_scope_locked": locked,
         "protocol_rigor_appendix": protocol_active,
+        "rerank_info": rerank_info,
+        "retrieval_diagnostics": retrieval_diag,
     }
 
 
@@ -800,7 +1030,7 @@ def retrieve_with_supplementary_boost(
             "search_queries": {"paper_query": query, "sop_query": query},
         }
     )
-    paper_docs, _, _ = retrieve_dual_path_filtered(
+    paper_docs, _, _, _ = retrieve_dual_path_filtered(
         query,
         analysis,
         k=k,

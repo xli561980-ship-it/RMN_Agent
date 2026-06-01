@@ -1,0 +1,50 @@
+{
+  "rows": [
+    {
+      "strategy": "fixed",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "avg_chunk_chars": 0,
+      "paper_chunks": 0,
+      "sop_chunks": 0,
+      "stats_warning": "使用 Google 嵌入时请设置 GOOGLE_API_KEY 或 GEMINI_API_KEY",
+      "recall@5": 0.0,
+      "mrr": 0.0,
+      "doc_type_accuracy": 0.0,
+      "citation_coverage_if_available": 0.0
+    },
+    {
+      "strategy": "header_aware",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "avg_chunk_chars": 0,
+      "paper_chunks": 0,
+      "sop_chunks": 0,
+      "stats_warning": "使用 Google 嵌入时请设置 GOOGLE_API_KEY 或 GEMINI_API_KEY",
+      "recall@5": 0.0,
+      "mrr": 0.0,
+      "doc_type_accuracy": 0.0,
+      "citation_coverage_if_available": 0.0
+    },
+    {
+      "strategy": "parent_child",
+      "rebuilt": false,
+      "note": "未传入 --rebuild，未重建向量库；将使用当前 Chroma 结果作为对照。",
+      "index_build_time_sec": 0.0,
+      "total_chunks": 0,
+      "avg_chunk_chars": 0,
+      "paper_chunks": 0,
+      "sop_chunks": 0,
+      "stats_warning": "使用 Google 嵌入时请设置 GOOGLE_API_KEY 或 GEMINI_API_KEY",
+      "recall@5": 0.0,
+      "mrr": 0.0,
+      "doc_type_accuracy": 0.0,
+      "citation_coverage_if_available": 0.0
+    }
+  ],
+  "k": 5
+}

@@ -1,0 +1,380 @@
+{
+  "skipped": false,
+  "metrics": {
+    "cases": 5,
+    "successful_cases": 5,
+    "answer_generated_rate": 1.0,
+    "citation_present_rate": 1.0,
+    "unknown_citation_rate": 0.4,
+    "numeric_claim_without_citation_count": 5,
+    "insufficient_evidence_flag_rate": 0.4
+  },
+  "cases": [
+    {
+      "id": "sop_litesizer_basic",
+      "question": "Litesizer 500 做温度序列测量时，平衡时间有什么要求？",
+      "analyzer_result": {
+        "entities": [
+          "Litesizer 500",
+          "温度序列测量",
+          "平衡时间"
+        ],
+        "intent": "SOP_ONLY",
+        "answer_mode": "OPERATIONAL",
+        "paper_scope_source": null,
+        "paper_scope_project_id": null,
+        "paper_scope_paper_title": null,
+        "requires_full_protocol": false,
+        "search_queries": {
+          "sop_query": "Litesizer 500 温度序列测量 平衡时间 要求 操作规程",
+          "paper_query": "Litesizer 500 temperature trend equilibration time settings"
+        }
+      },
+      "retrieved_sources": [
+        {
+          "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "manuals/Litesizer 500 Instruction Manual .pdf",
+          "doc_type": "sop"
+        }
+      ],
+      "generated_answer": "根据 Litesizer 500 的标准操作规程（SOP），在进行温度序列测量时，关于平衡时间的要求和建议如下：\n\n### 🧪 关键参数与平衡要求\n\n*   **温度测量范围**：Litesizer 500 能够在 0 到 90˚C 之间的任何温度下进行测量 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.59]。\n*   **平衡时间的一般原则**：测量温度距离环境温度（室温）越远，所需的平衡时间就越长 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.39] [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.48]。\n*   **平衡时间计算准则（经验法则）**：\n    *   对于 1mL 的样品，通常的规则是：**测量温度与环境温度每相差 1˚C，需增加 1 分钟的平衡时间** [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.48]。\n    *   这一近似计算方法适用于水基样品（water-based samples） [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.39]。\n\n### ⚠️ 操作规范与注意事项\n\n*   **热绝缘盖的使用**：为了确保在非室温条件下的测量结果可靠，必须使用**热绝缘盖（thermal insulation cover）**。这有助于保持样品和比色皿温度恒定，从而最大限度地减少样品内部的热对流 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.59]。\n*   **可靠性保障**：在非室温下测量时，加入额外的平衡时间是确保测量可靠性的重要步骤 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.59]。\n\n### 📋 综合操作建议\n\n在设置温度序列测量时，请遵循以下步骤以符合 SOP 要求：\n1.  **手动设置温度**：根据实验需求在 0 至 90˚C 之间设定目标温度 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.48]。\n2.  **计算平衡时间**：参考环境温度，按“1分钟/1˚C”的标准预留平衡时间（以 1mL 样品为例） [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.48]。\n3.  **安装硬件防护**：务必盖上热绝缘盖以减少热电流干扰 [Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.59]。",
+      "citation_validation": {
+        "ok": true,
+        "cited_hints": [
+          "[Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.59]",
+          "[Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.39]",
+          "[Source: SOP `manuals/Litesizer 500 Instruction Manual .pdf` p.48]"
+        ],
+        "unknown_hints": [],
+        "missing_citation_numeric_claims": [],
+        "allowed_hint_count": 5
+      },
+      "expected_route": "SOP_ONLY",
+      "expected_doc_types": [
+        "sop"
+      ],
+      "answer_generated": true,
+      "citation_present": true,
+      "unknown_citation_count": 0,
+      "numeric_claim_without_citation_count": 0,
+      "insufficient_evidence_flag": false,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "id": "paper_protocol_microgel",
+      "question": "Photothermally powered 3D microgels 这篇论文的完整制备/刺激流程中，当前上下文能支持哪些关键步骤和参数？",
+      "analyzer_result": {
+        "entities": [
+          "Photothermally powered 3D microgels",
+          "microgels",
+          "photothermal stimulation",
+          "fabrication process"
+        ],
+        "intent": "PAPER_ONLY",
+        "answer_mode": "OPERATIONAL",
+        "paper_scope_source": null,
+        "paper_scope_project_id": null,
+        "paper_scope_paper_title": "Photothermally powered 3D microgels",
+        "requires_full_protocol": true,
+        "search_queries": {
+          "sop_query": "3D microgel preparation and photothermal stimulation experimental steps",
+          "paper_query": "Photothermally powered 3D microgels preparation parameters stimulation protocol fabrication steps"
+        }
+      },
+      "retrieved_sources": [
+        {
+          "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/adma70800-sup-0001-suppmat.docx",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/adma70800-sup-0001-suppmat.docx",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/adma70800-sup-0001-suppmat.docx",
+          "doc_type": "paper"
+        }
+      ],
+      "generated_answer": "根据提供的文献资料，关于“光热驱动3D微凝胶（Photothermally powered 3D microgels）”的制备与刺激流程，当前上下文支持的关键步骤和参数如下：\n\n### 🧪 关键参数与条件\n*   **核心材料成分**：\n    *   **热响应纳米元件**：NIPMAM-co-NIPAM共聚物，其相转变温度调整至38–42°C（Recipe 3为39°C），在39°C时的溶胀比为0.58 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.2, p.5]。\n    *   **光热转换剂**：金纳米棒（GNRs），用于吸收785 nm近红外光并产生等离激元加热 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.3]。\n    *   **基质**：海藻酸钠（Alginate）网络，包括RGD肽修饰的海藻酸钠（用于细胞粘附）和罗丹明B修饰的海藻酸钠（用于温度监测） [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.7, p.19]。\n*   **光热刺激参数**：\n    *   **光源**：785 nm近红外激光 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.3]。\n    *   **功率密度**：常用4.45 µW µm⁻²；在位移定量实验中测试了3.93 µW µm⁻² (100 mA)至7.95 µW µm⁻² (160 mA) [Source: `papers/adma70800-sup-0001-suppmat.docx` p.2, p.3]。\n    *   **频率与占空比**：1 Hz（50%占空比），持续30分钟；频率响应测试范围为1-4 Hz [Source: `papers/adma70800-sup-0001-suppmat.docx` p.3; `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18]。\n    *   **力学输出**：可产生高达34 nN的各向异性力 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.2]。\n\n⚠️ **安全与合规警告**：当前检索到的参考资料中未包含标准操作规程（SOP）。在进行纳米材料合成、高功率激光操作及微流控芯片加工时，必须严格遵守实验室特定的安全准则和审批流程。请联系实验室管理员获取完整的安全手册。\n\n---\n\n### 完整严格流程（仅依据检索片段）\n\n#### 1. 纳米执行器（Nanoactuators）合成流程\n1.  **种子介导合成**：在硝酸银存在下合成金纳米棒（GNRs） [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.3]。\n2.  **核壳结构构建**：\n    *   加入0.4 mmol的N,N’-亚甲基双丙烯酰胺（交联剂）。\n    *   引入6 mL金纳米棒溶液，将搅拌速度提高至1400 rpm。\n    *   1分钟后，注入480 μL脱气的0.1 M AAPH引发剂。\n    *   在70°C、连续通氮气（N₂）条件下搅拌反应2小时。\n    *   反应30分钟后，直接加入稀释于1 mL脱气高纯水（HPW）中的60 μL烯丙胺。\n3.  **洗涤与收集**：反应完成后冷却至室温，使用高纯水通过离心（11000 rpm，3个循环）洗涤纳米执行器 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.17-18]。\n\n#### 2. 微流控芯片加工\n1.  **光刻胶显影**：SU8模具在mr-Dev 600中显影5秒，异丙醇冲洗10秒，再次在mr-Dev 600中显影5秒。\n2.  **PDMS模具制作**：将PDMS预聚物与固化剂按10:1重量比混合，搅拌至少3分钟，在干燥器中脱气，随后在65°C下软烘1小时。\n3.  **打孔与清洗**：使用0.8 mm直径的活检穿刺器创建进出口。将PDMS和玻璃片分别用乙醇和去离子水超声清洗5分钟 [Source: `papers/adma70800-sup-0001-suppmat.docx` p.1]。\n\n#### 3. 3D微凝胶制备与细胞封装\n1.  **混合液配制**：\n    *   **水相1**：携带细胞、CaCO₃纳米颗粒和叠氮化修饰的海藻酸钠。\n    *   **水相2**：包含40 μL RGD修饰海藻酸钠（2 wt%）或未修饰海藻酸钠、20 μL 罗丹明B修饰海藻酸钠（2 wt%）、50 μL DBCO修饰的热响应聚合物片段（12 mg/mL）以及10 μL 金纳米棒（5 mg/mL或3 mg/mL）。\n2.  **均质化**：使用探头超声（Tip sonication）处理15秒。\n3.  **微流控生成**：使用通道尺寸为40 μm的T型接头（T-junction）设备，通过蛇形结构确保纳米复合材料均匀混合并封装细胞 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.7, p.19]。\n\n#### 4. 光热刺激与监测\n1.  **激光驱动**：通过显微镜物镜将785 nm激光聚焦于3D工作区内的微凝胶。\n2.  **刺激模式**：\n    *   **各向同性压缩**：全范围驱动。\n    *   **各向异性张力**：局部非对称驱动。\n3.  **温度实时监测**：记录罗丹明B的荧光强度变化，并使用以下公式转换为温度值：\n    $T(^\\circ C) = \\frac{I_{RhB} - 1.28}{-0.0095} + 12.7$ [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18-19]。\n\n**上下文中未提供的步骤（可能存在于未检索到的页/节）：**\n*   微流控过程中使用的具体油相成分（仅提及“如前所述”）。\n*   CaCO₃纳米颗粒的具体浓度及触发海藻酸钠交联的具体酸化/释放钙离子步骤。\n*   细胞在封装前的具体密度和培养基配方。\n*   激光驱动时物镜的具体倍率。",
+      "citation_validation": {
+        "ok": false,
+        "cited_hints": [
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.2, p.5]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.3]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.7, p.19]",
+          "[Source: `papers/adma70800-sup-0001-suppmat.docx` p.2, p.3]",
+          "[Source: `papers/adma70800-sup-0001-suppmat.docx` p.3; `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.2]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.17-18]",
+          "[Source: `papers/adma70800-sup-0001-suppmat.docx` p.1]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18-19]"
+        ],
+        "unknown_hints": [
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.2, p.5]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.7, p.19]",
+          "[Source: `papers/adma70800-sup-0001-suppmat.docx` p.2, p.3]",
+          "[Source: `papers/adma70800-sup-0001-suppmat.docx` p.3; `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.17-18]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.18-19]"
+        ],
+        "missing_citation_numeric_claims": [
+          "*   **水相2**：包含40 μL RGD修饰海藻酸钠（2 wt%）或未修饰海藻酸钠、20 μL 罗丹明B修饰海藻酸钠（2 wt%）、50 μL DBCO修饰的热响应聚合物片段（12 mg/mL）以及10 μL 金纳米棒（5 mg/mL或3 mg/mL）。"
+        ],
+        "allowed_hint_count": 12
+      },
+      "expected_route": "PAPER_ONLY",
+      "expected_doc_types": [
+        "paper"
+      ],
+      "answer_generated": true,
+      "citation_present": true,
+      "unknown_citation_count": 6,
+      "numeric_claim_without_citation_count": 3,
+      "insufficient_evidence_flag": true,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "id": "hybrid_replicate_safety",
+      "question": "如果我要参考论文里的 microgel 参数做一次实验，需要同时注意哪些本实验室 SOP 或安全限制？",
+      "analyzer_result": {
+        "entities": [
+          "microgel",
+          "SOP",
+          "safety restrictions"
+        ],
+        "intent": "HYBRID",
+        "answer_mode": "HYBRID",
+        "paper_scope_source": null,
+        "paper_scope_project_id": null,
+        "paper_scope_paper_title": null,
+        "requires_full_protocol": false,
+        "search_queries": {
+          "sop_query": "microgel synthesis safety SOP lab restrictions equipment handling",
+          "paper_query": "microgel synthesis parameters experimental conditions materials"
+        }
+      },
+      "retrieved_sources": [
+        {
+          "source": "papers/d3nr06485a.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "manuals/General Lab Rules MRBL-2.pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "papers/indenting-at-the-microscale-guidelines-for-robust-mechanical-characterization-of-alginate-microgels.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "manuals/General Lab Rules MRBL-2.pdf",
+          "doc_type": "sop"
+        },
+        {
+          "source": "papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf",
+          "doc_type": "paper"
+        }
+      ],
+      "generated_answer": "在参考论文参数进行微凝胶（microgel）实验时，必须严格遵守实验室的 SOP（标准操作程序）和安全限制。以下是根据实验室文件整理的注意事项：\n\n### 1. 设备操作与人员资质 (SOP 强制要求)\n在执行论文中的任何实验步骤前，必须确保满足以下管理要求：\n*   **人员培训**：所有设备必须由经过培训的人员按照说明书操作 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。\n*   **危险设备准入**：实验中涉及的**离心机（Centrifuges）**、**泵（Pumps）**等被列为危险设备，必须阅读其专门的“操作指令（Betriebsanweisung）” [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。\n*   **特殊工艺授权**：如果你参考的论文涉及**微流控工艺（Microfluidics process）**，必须经过专项培训方可操作 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.4]。\n\n### 2. 化学品与纳米材料安全 (核心限制)\n论文中常涉及金纳米棒（gold nanorods）或特定化学试剂，其实验操作受以下限制：\n*   **通风橱使用**：任何涉及溶剂、酸、碱以及**细粉末（fine powders）**的操作必须在通风橱内进行 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。\n*   **纳米颗粒限制**：**纳米颗粒仅允许在通风橱内合成**。此外，含有游离纳米颗粒的容器严禁带出通风橱 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。\n*   **MSDS 阅读**：在接触任何化学品前，所有用户必须阅读其化学品安全技术说明书（MSDS） [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.4]。\n\n### 3. 实验参数执行建议 (结合论文与 SOP)\n在应用论文中的具体参数时，需注意以下安全与操作细节：\n\n*   **搅拌参数**：\n    *   论文参考：合成 NIPMAM 微凝胶时可能需要 700 rpm 至 1400 rpm 的高速搅拌 [Source: `papers/d3nr06485a.pdf` p.7]。\n    *   SOP 提醒：使用磁力搅拌器时，应先选择低速，并确保设备放置稳固，仅使用合适且无损的容器 [Source: SOP `manuals/BA Magnetic stirrer_eng.pdf` p.1]。\n*   **离心参数**：\n    *   论文参考：海藻酸盐微凝胶（Alginate microgels）的清洗可能涉及 50 rcf 和 1000 rcf 的分步离心 [Source: `papers/indenting-at-the-microscale-guidelines-for-robust-mechanical-characterization-of-alginate-microgels.pdf` p.3]。\n    *   SOP 提醒：离心机属于危险设备，操作前必须确认已掌握紧急情况下的处理措施 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。\n*   **超声处理**：\n    *   论文参考：金纳米棒与海藻酸盐的混合通常需要探头超声（tip-sonication）处理（如 15 秒）以确保均匀 [Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.19]。\n*   **生物安全**：\n    *   如果微凝胶用于细胞实验（如封装间充质干细胞），必须遵守 **S1 安全简报**中的生物安全和遗传安全规定 [Source: SOP `manuals/BioelectronicsLab-S1-SafetyBriefing.pdf` p.2]。\n\n### 4. 风险预警\n*   **严禁擅自操作**：严禁在未接受培训的情况下使用氢氟酸（HF）或王水（Aqua regia）等危险物质 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.4]。\n*   **故障处理**：若实验设备（如搅拌器）出现技术缺陷，应立即关闭设备，若无法排除故障，必须联系项目负责人（Prof. Berna Özkale-Edelmann） [Source: SOP `manuals/BA Magnetic stirrer_eng.pdf` p.1]。\n\n**总结建议**：在开始实验前，请先将论文中的参数（如 70 °C 加热、1400 rpm 搅拌、金纳米棒浓度等）填入实验计划，并对照实验室 MSDS 库核对所有化学品的存放位置与防护要求 [Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]。",
+      "citation_validation": {
+        "ok": true,
+        "cited_hints": [
+          "[Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.3]",
+          "[Source: SOP `manuals/General Lab Rules MRBL-2.pdf` p.4]",
+          "[Source: `papers/d3nr06485a.pdf` p.7]",
+          "[Source: SOP `manuals/BA Magnetic stirrer_eng.pdf` p.1]",
+          "[Source: `papers/indenting-at-the-microscale-guidelines-for-robust-mechanical-characterization-of-alginate-microgels.pdf` p.3]",
+          "[Source: `papers/Advanced Materials - 2025 - Wang - Photothermally Powered 3D Microgels Mechanically Regulate Mesenchymal Stem Cells Under (2).pdf` p.19]",
+          "[Source: SOP `manuals/BioelectronicsLab-S1-SafetyBriefing.pdf` p.2]"
+        ],
+        "unknown_hints": [],
+        "missing_citation_numeric_claims": [],
+        "allowed_hint_count": 9
+      },
+      "expected_route": "HYBRID",
+      "expected_doc_types": [
+        "paper",
+        "sop"
+      ],
+      "answer_generated": true,
+      "citation_present": true,
+      "unknown_citation_count": 0,
+      "numeric_claim_without_citation_count": 0,
+      "insufficient_evidence_flag": false,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "id": "paper_compare",
+      "question": "对比两篇关于 3D microgels mechanical stimulation 的论文，刺激方式、时间和细胞响应有什么差异？",
+      "analyzer_result": {
+        "entities": [
+          "3D microgels",
+          "mechanical stimulation",
+          "cellular response"
+        ],
+        "intent": "PAPER_ONLY",
+        "answer_mode": "SCHOLARLY",
+        "paper_scope_source": null,
+        "paper_scope_project_id": null,
+        "paper_scope_paper_title": null,
+        "requires_full_protocol": false,
+        "search_queries": {
+          "sop_query": "3D microgels mechanical stimulation experimental procedures",
+          "paper_query": "comparison of 3D microgels mechanical stimulation methods duration and cellular response"
+        }
+      },
+      "retrieved_sources": [
+        {
+          "source": "papers/d2lc00203e1.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        }
+      ],
+      "generated_answer": "根据提供的参考资料，以下是对两篇关于 3D 微凝胶（microgels）机械刺激论文在刺激方式、持续时间及细胞响应方面的对比分析：\n\n### 1. 刺激方式 (Stimulation Method)\n\n*   **论文 1 (Actuated 3D microgels...):**\n    *   采用**驱动循环（Actuation cycles）**模式，具体表现为“1秒开启（1 second on）”并配合“毫秒级脉冲时长（msec pulse duration）” [Source: `papers/d2lc00203e1.pdf` p.3]。\n*   **论文 2 (Mechanoactivation of Single Stem Cells...):**\n    *   开发了名为 **3D-PRESS** 的平台，利用 3D 打印的刺激装置进行**动态压力刺激（Dynamic pressure system）** [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.8]。\n    *   该装置通过压力控制器（OB1 Pressure Controller）调节**压缩空气压力**，范围在 **25–400 kPa** 之间，对封装在 alginate 微凝胶中的单个细胞施加周期性且均匀的力 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.8, 9]。\n\n### 2. 刺激与监测时间 (Duration)\n\n*   **论文 1:**\n    *   实验监测周期较长，微凝胶中的细胞被**监测了 3 天** [Source: `papers/d2lc00203e1.pdf` p.3]。\n*   **论文 2:**\n    *   刺激过程包含 **30 分钟**的周期，并在刺激结束后 **24 小时**进行后续观察 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]。\n    *   研究还提到了针对 YAP 易位等事件的“长时刺激（long durations of stimulation）” [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.6]。\n\n### 3. 细胞响应 (Cellular Response)\n\n*   **论文 1:**\n    *   **形态变化：** 记录了在活性微凝胶中细胞直径的变化 [Source: `papers/d2lc00203e1.pdf` p.3]。\n    *   **信号转导：** 测量了最大归一化细胞内信号（intracellular signaling） [Source: `papers/d2lc00203e1.pdf` p.3]。\n*   **论文 2:**\n    *   **细胞活力：** 证实了压力刺激的安全性，在刺激后 30 分钟和 24 小时，细胞活力均保持在 **95% 以上** [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]。\n    *   **钙信号：** 在 200 kPa 压力下，3D 微凝胶中的细胞表现出比 2D 培养更高的钙信号活跃度；**200 kPa** 被确定为启动细胞内钙信号的阈值 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 7]。\n    *   **转录因子易位：** 在含有 RGD 肽的微凝胶中，200 kPa 的压力触发了 **Yes 相关蛋白 (YAP) 向细胞核的易位**，揭示了整合素介导的机械转导机制 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 6]。\n\n### 总结对比表\n\n| 特性 | 论文 1 (`d2lc00203e1.pdf`) | 论文 2 (`İyisan - Mechanoactivation...`) |\n| :--- | :--- | :--- |\n| **核心装置** | 驱动式 3D 微凝胶 | 3D-PRESS (3D 打印压力舱) |\n| **刺激性质** | 毫秒级脉冲驱动循环 | 气动压力 (25–400 kPa) |\n| **主要时间点** | 监测 3 天 | 30 分钟刺激；24 小时后观察 |\n| **关键响应** | 细胞直径变化、细胞内信号 | 钙信号增强 (≥200 kPa)、YAP 核易位、高活力 (>95%) |\n\n⚠️ **风险提示：** 本回答引用的实验参数（如压力范围、脉冲时间）来源于学术论文。由于参考资料中未提供标准操作规程（SOP），在尝试复制上述机械刺激实验前，请务必咨询实验室管理人员并制定详细的安全操作手册，以确保高压气动装置的使用安全。",
+      "citation_validation": {
+        "ok": false,
+        "cited_hints": [
+          "[Source: `papers/d2lc00203e1.pdf` p.3]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.8]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.8, 9]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.6]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 7]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 6]"
+        ],
+        "unknown_hints": [
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.8, 9]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.6]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 7]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.4, 6]"
+        ],
+        "missing_citation_numeric_claims": [
+          "| **刺激性质** | 毫秒级脉冲驱动循环 | 气动压力 (25–400 kPa) |",
+          "| **关键响应** | 细胞直径变化、细胞内信号 | 钙信号增强 (≥200 kPa)、YAP 核易位、高活力 (>95%) |"
+        ],
+        "allowed_hint_count": 8
+      },
+      "expected_route": "PAPER_ONLY",
+      "expected_doc_types": [
+        "paper"
+      ],
+      "answer_generated": true,
+      "citation_present": true,
+      "unknown_citation_count": 4,
+      "numeric_claim_without_citation_count": 2,
+      "insufficient_evidence_flag": true,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "id": "missing_evidence",
+      "question": "这些文献是否证明了该 microgel 方法在所有干细胞类型中都有效？",
+      "analyzer_result": {
+        "entities": [
+          "microgel method",
+          "stem cells"
+        ],
+        "intent": "PAPER_ONLY",
+        "answer_mode": "SCHOLARLY",
+        "paper_scope_source": null,
+        "paper_scope_project_id": null,
+        "paper_scope_paper_title": null,
+        "requires_full_protocol": false,
+        "search_queries": {
+          "sop_query": "microgel fabrication and stem cell handling procedures",
+          "paper_query": "microgel method efficacy across various stem cell types comparison and results"
+        }
+      },
+      "retrieved_sources": [
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf",
+          "doc_type": "paper"
+        },
+        {
+          "source": "papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf",
+          "doc_type": "paper"
+        }
+      ],
+      "generated_answer": "根据提供的文献，**不能证明该微凝胶（microgel）方法在“所有”干细胞类型中都有效**。虽然文献展示了该方法在多种干细胞和细胞类型中的广泛适用性，但研究主要集中在特定类型的干细胞（如间充质干细胞和多能干细胞），并指出了维持不同细胞类型存活和功能的特定条件。\n\n以下是基于文献的详细分析：\n\n### 1. 已证实的干细胞类型\n文献明确记录了该方法在以下干细胞类型中的应用：\n*   **间充质干细胞 (MSCs)**：研究通过微流控技术成功将单个 MSCs 封装在海藻酸盐微凝胶中，并研究了其力学激活和分化 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]。\n*   **多能干细胞 (Pluripotent Stem Cells)**：文献提到将多能干细胞封装在核壳结构微凝胶（微囊）中，能够形成活细胞菌落并分化为功能性心脏微组织 [Source: `papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf` p.2]。\n*   **成体干细胞 (Adult Stem Cells)**：文献指出微凝胶系统具备控制成体干细胞生化和生物力学特性的能力 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.2]。\n\n### 2. 方法的普适性潜力与测试\n文献暗示了该技术具有广泛的应用潜力，但并未涵盖“所有”类型：\n*   **多细胞类型适用性**：3D-PRESS 平台被描述为“适用于各种细胞类型的多功能工具 (versatile tool... applicable to various cell types)” [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.1]。\n*   **非干细胞验证**：为了测试设备的适应性，研究人员还成功对 **HT1080 人纤维肉瘤细胞** 进行了培养和气动刺激，确认了设备的兼容性 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]。\n\n### 3. 局限性与特定需求\n文献中的证据表明，该方法的效果高度依赖于微凝胶的成分设计，并非对所有细胞都“开箱即用”：\n*   **配体依赖性**：对于 MSCs 等细胞，生存需要粘附到细胞外基质。实验显示，缺乏 RGD 肽的微凝胶中，细胞存活率较低且会出现细胞外逸（egression）现象 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.5]。\n*   **结构完整性挑战**：在长期培养中，MSCs 可能会因为基质重塑而从微凝胶中逸出。为了解决这一问题，必须引入“二次海藻酸盐涂层和钙处理”来增强结构完整性 [Source: `papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf` p.2]。\n*   **模量调节**：不同细胞对基质硬度有不同要求。例如，通过改变共价交联密度或增加链接分子的分子量，可以显著改变微凝胶的弹性模量，从而影响干细胞的命运 [Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.2]。\n\n### 结论\n文献证明了该微凝胶方法在**间充质干细胞、多能干细胞及某些癌细胞系**中是有效的，并强调了其作为探索单细胞力学生物学通用工具的潜力。然而，由于不同干细胞对微环境（如 RGD 配体、基质硬度、结构稳定性）有特定的生物学需求，该方法在未经针对性优化的其他干细胞类型中的有效性尚缺乏直接证据支持。",
+      "citation_validation": {
+        "ok": true,
+        "cited_hints": [
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.3]",
+          "[Source: `papers/Adv Materials Inter - 2024 - Özkale - Why Biopolymer Microgels with Dynamically Switchable Properties Would be a Great.pdf` p.2]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.2]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.1]",
+          "[Source: `papers/Small Methods - 2024 - İyisan - Mechanoactivation of Single Stem Cells in Microgels Using a 3D‐Printed Stimulation Device.pdf` p.5]",
+          "[Source: `papers/Small Science - 2025 - İyisan - Hydrostatic Pressure Induces Osteogenic Differentiation of Single Stem Cells in 3D (1).pdf` p.2]"
+        ],
+        "unknown_hints": [],
+        "missing_citation_numeric_claims": [],
+        "allowed_hint_count": 8
+      },
+      "expected_route": "PAPER_ONLY",
+      "expected_doc_types": [
+        "paper"
+      ],
+      "answer_generated": true,
+      "citation_present": true,
+      "unknown_citation_count": 0,
+      "numeric_claim_without_citation_count": 0,
+      "insufficient_evidence_flag": false,
+      "ok": true,
+      "error": ""
+    }
+  ],
+  "k": 5
+}
